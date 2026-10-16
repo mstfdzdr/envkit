@@ -1,0 +1,157 @@
+<ui:FluentWindow x:Class="EnvKit.App.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+                 xmlns:views="clr-namespace:EnvKit.App.Views"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance vm:MainViewModel}"
+                 Title="EnvKit"
+                 Width="1180"
+                 Height="760"
+                 MinWidth="880"
+                 MinHeight="560"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica"
+                 WindowCornerPreference="Round">
+  <ui:FluentWindow.Resources>
+    <DataTemplate DataType="{x:Type vm:PathViewModel}">
+      <views:PathView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:VariablesViewModel}">
+      <views:VariablesView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
+      <views:HistoryView />
+    </DataTemplate>
+  </ui:FluentWindow.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <ui:TitleBar Grid.Row="0" Title="EnvKit" />
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="200" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <ListBox Grid.Column="0"
+               Margin="8,0,8,8"
+               Background="Transparent"
+               BorderThickness="0"
+               ItemsSource="{Binding Pages}"
+               SelectedItem="{Binding SelectedPage}"
+               AutomationProperties.Name="Navigation">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal" Margin="4,6">
+              <ui:SymbolIcon Symbol="{Binding Icon}" FontSize="18" Margin="0,0,12,0" />
+              <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="14" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Grid Grid.Column="1" Margin="8,0,24,16">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:InfoBar Grid.Row="0"
+                    Margin="0,0,0,12"
+                    Title="{Binding StatusTitle}"
+                    Message="{Binding StatusMessage}"
+                    Severity="{Binding StatusSeverity}"
+                    IsOpen="{Binding IsStatusOpen, Mode=TwoWay}"
+                    IsClosable="True" />
+
+        <ContentControl Grid.Row="1" Content="{Binding SelectedPage}" Focusable="False" />
+      </Grid>
+    </Grid>
+
+    <!-- Every write is confirmed here, whichever page started it. -->
+    <Border Grid.Row="0"
+            Grid.RowSpan="2"
+            Background="#99000000"
+            Visibility="{Binding Review, Converter={StaticResource NullToVisibility}}">
+      <Border MaxWidth="760"
+              MaxHeight="600"
+              Margin="48"
+              Padding="24"
+              CornerRadius="8"
+              Background="{DynamicResource ApplicationBackgroundBrush}"
+              BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+              BorderThickness="1"
+              DataContext="{Binding Review}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <TextBlock Grid.Row="0" Text="Review changes" Style="{StaticResource PageTitle}" />
+          <TextBlock Grid.Row="1" Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,0,0,12" />
+
+          <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Changes}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Note, StringFormat='  ({0})'}">
+                        <TextBlock.Style>
+                          <Style TargetType="TextBlock" BasedOn="{StaticResource Muted}">
+                            <Style.Triggers>
+                              <DataTrigger Binding="{Binding Note}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                              </DataTrigger>
+                            </Style.Triggers>
+                          </Style>
+                        </TextBlock.Style>
+                      </TextBlock>
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Lines}" Margin="12,4,0,0">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <TextBlock Text="{Binding Converter={StaticResource DiffLineText}}"
+                                     Foreground="{Binding Kind, Converter={StaticResource DiffLineBrush}}"
+                                     FontFamily="Cascadia Mono, Consolas"
+                                     TextWrapping="Wrap" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+
+          <TextBlock Grid.Row="3"
+                     Margin="0,8,0,0"
+                     Style="{StaticResource Problem}"
+                     Text="Includes machine-scope changes, which need administrator rights."
+                     Visibility="{Binding RequiresElevation, Converter={StaticResource BoolToVisibility}}" />
+
+          <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <ui:Button Content="Cancel" Command="{Binding CancelCommand}" Margin="0,0,8,0" MinWidth="96" />
+            <ui:Button Content="Apply" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
+                       Command="{Binding ApplyCommand}" MinWidth="96" />
+          </StackPanel>
+        </Grid>
+      </Border>
+    </Border>
+  </Grid>
+</ui:FluentWindow>

@@ -6,6 +6,7 @@
     <Project Path="src/EnvKit.Windows/EnvKit.Windows.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/EnvKit.App.Tests/EnvKit.App.Tests.csproj" />
     <Project Path="tests/EnvKit.Cli.Tests/EnvKit.Cli.Tests.csproj" />
     <Project Path="tests/EnvKit.Core.Tests/EnvKit.Core.Tests.csproj" />
     <Project Path="tests/EnvKit.Testing/EnvKit.Testing.csproj" />

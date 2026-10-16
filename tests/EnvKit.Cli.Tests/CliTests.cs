@@ -138,6 +138,19 @@ public sealed class CliTests : IDisposable
     }
 
     [Fact]
+    public void Var_list_masks_secrets_unless_asked()
+    {
+        _store.Set(new EnvVariable("GITHUB_TOKEN", "ghp_do_not_print", EnvScope.User));
+
+        Run("var", "list", "--scope", "user");
+        Assert.DoesNotContain("ghp_do_not_print", Output, StringComparison.Ordinal);
+        Assert.Contains("GITHUB_TOKEN = ********", Output, StringComparison.Ordinal);
+
+        Run("var", "list", "--scope", "user", "--show-secrets");
+        Assert.Contains("ghp_do_not_print", Output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Var_get_with_scope_prints_only_the_value()
     {
         Run("var", "get", "Path", "--scope", "machine");

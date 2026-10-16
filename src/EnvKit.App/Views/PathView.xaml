@@ -1,0 +1,120 @@
+<UserControl x:Class="EnvKit.App.Views.PathView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:PathViewModel}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" Text="PATH" Style="{StaticResource PageTitle}" />
+
+    <DockPanel Grid.Row="1" Margin="0,0,0,12" LastChildFill="False">
+      <ComboBox DockPanel.Dock="Left" MinWidth="140" ItemsSource="{Binding Scopes}" SelectedItem="{Binding Scope}"
+                AutomationProperties.Name="Scope" />
+      <TextBlock DockPanel.Dock="Left" Margin="16,0,0,0" VerticalAlignment="Center" Text="{Binding Summary}"
+                 Style="{StaticResource Muted}" />
+      <ui:Button DockPanel.Dock="Right" Content="Review &amp; save" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
+                 Command="{Binding SaveCommand}" Margin="8,0,0,0" />
+      <ui:Button DockPanel.Dock="Right" Content="Revert" Icon="{ui:SymbolIcon ArrowUndo24}"
+                 Command="{Binding RevertCommand}" Margin="8,0,0,0" />
+      <ui:Button DockPanel.Dock="Right" Content="Remove missing" Icon="{ui:SymbolIcon Delete24}"
+                 Command="{Binding RemoveMissingCommand}" Margin="8,0,0,0"
+                 ToolTip="Remove directories that do not exist. Check removable and network drives first." />
+      <ui:Button DockPanel.Dock="Right" Content="Fix empty &amp; duplicates" Icon="{ui:SymbolIcon Wrench24}"
+                 Command="{Binding FixProblemsCommand}" />
+    </DockPanel>
+
+    <ListBox x:Name="EntryList"
+             Grid.Row="2"
+             ItemsSource="{Binding Entries}"
+             SelectedItem="{Binding SelectedEntry}"
+             AllowDrop="True"
+             PreviewMouseLeftButtonDown="OnEntryMouseDown"
+             PreviewMouseMove="OnEntryMouseMove"
+             Drop="OnEntryDrop"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+             AutomationProperties.Name="PATH entries">
+      <ListBox.ItemContainerStyle>
+        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+          <Setter Property="Padding" Value="8,3" />
+          <Setter Property="Margin" Value="0,1" />
+          <Setter Property="MinHeight" Value="0" />
+        </Style>
+      </ListBox.ItemContainerStyle>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Grid Margin="0,2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="36" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Index}" Style="{StaticResource Muted}" VerticalAlignment="Top" />
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{Binding Display}" FontFamily="Cascadia Mono, Consolas" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding Expanded, StringFormat='= {0}'}" Style="{StaticResource Muted}" FontSize="12"
+                         Visibility="{Binding ShowExpanded, Converter={StaticResource BoolToVisibility}}" />
+              <TextBlock Text="{Binding Problems}" Style="{StaticResource Problem}" FontSize="12"
+                         Visibility="{Binding HasProblems, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <Grid Grid.Row="3" Margin="0,12,0,0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <ui:TextBox Grid.Column="0" Text="{Binding NewEntry, UpdateSourceTrigger=PropertyChanged}"
+                  PlaceholderText="Directory, e.g. %USERPROFILE%\bin" FontFamily="Cascadia Mono, Consolas"
+                  AutomationProperties.Name="Directory" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+        <ui:Button Content="Browse…" Icon="{ui:SymbolIcon FolderOpen24}" Click="OnBrowse" Margin="0,0,8,0" />
+        <ui:Button Content="Add" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddCommand}" Margin="0,0,8,0" />
+        <ui:Button Content="Replace" Icon="{ui:SymbolIcon Edit24}" Command="{Binding ReplaceCommand}" Margin="0,0,8,0" />
+        <ui:Button Icon="{ui:SymbolIcon ArrowUp24}" Command="{Binding MoveUpCommand}" ToolTip="Move up" Margin="0,0,8,0"
+                   AutomationProperties.Name="Move up" />
+        <ui:Button Icon="{ui:SymbolIcon ArrowDown24}" Command="{Binding MoveDownCommand}" ToolTip="Move down" Margin="0,0,8,0"
+                   AutomationProperties.Name="Move down" />
+        <ui:Button Content="Remove" Icon="{ui:SymbolIcon Delete24}" Appearance="Danger" Command="{Binding RemoveCommand}" />
+      </StackPanel>
+    </Grid>
+
+    <Grid Grid.Row="4" Margin="0,16,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <ui:TextBox Grid.Column="0" Text="{Binding WhichQuery, UpdateSourceTrigger=PropertyChanged}"
+                  PlaceholderText="Which command runs? e.g. python" AutomationProperties.Name="Command name">
+        <ui:TextBox.InputBindings>
+          <KeyBinding Key="Enter" Command="{Binding WhichCommand}" />
+        </ui:TextBox.InputBindings>
+      </ui:TextBox>
+      <ui:Button Grid.Column="1" Content="Find" Icon="{ui:SymbolIcon Search24}" Command="{Binding WhichCommand}" Margin="8,0,0,0" />
+      <ItemsControl Grid.Row="1" Grid.ColumnSpan="3" Margin="0,8,0,0" ItemsSource="{Binding WhichResults}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding}" FontFamily="Cascadia Mono, Consolas" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Grid>
+  </Grid>
+</UserControl>

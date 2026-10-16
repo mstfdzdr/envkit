@@ -41,7 +41,7 @@ internal static class PathCommands
                 output.WriteLine($"{current} PATH ({Format.Kind(variable.Kind)}, {entries.Count} entries)");
                 foreach (var issue in report.Issues.Where(i => i.Scope == current && i.Entry is null))
                 {
-                    output.WriteLine($"  [{Describe(issue)}]");
+                    output.WriteLine($"  [{PathIssueText.Describe(issue)}]");
                 }
 
                 foreach (var entry in entries)
@@ -52,7 +52,7 @@ internal static class PathCommands
                         continue;
                     }
 
-                    var tags = issues.Count == 0 ? string.Empty : $"   [{string.Join(", ", issues.Select(Describe))}]";
+                    var tags = issues.Count == 0 ? string.Empty : $"   [{string.Join(", ", issues.Select(PathIssueText.Describe))}]";
                     output.WriteLine($"  {entry.Index,3}  {Format.Entry(entry.Raw)}{tags}");
                 }
             }
@@ -170,17 +170,4 @@ internal static class PathCommands
         });
         return command;
     }
-
-    internal static string Describe(PathIssue issue) => issue.Kind switch
-    {
-        PathIssueKind.Empty => "empty",
-        PathIssueKind.Missing => "missing",
-        PathIssueKind.Duplicate => $"duplicate of {issue.DuplicateOf!.Scope}#{issue.DuplicateOf.Index}",
-        PathIssueKind.Quoted => "quoted",
-        PathIssueKind.UnresolvedVariable => $"unresolved: {issue.Detail}",
-        PathIssueKind.NotExpanded => "not expanded: PATH is REG_SZ",
-        PathIssueKind.NotFullyQualified => "relative path",
-        PathIssueKind.ValueTooLong => $"value too long: {issue.Detail} > {EnvVariable.MaxValueLength} characters",
-        _ => issue.Kind.ToString(),
-    };
 }

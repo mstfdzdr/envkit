@@ -1,4 +1,5 @@
 using System.CommandLine;
+using EnvKit.Core.Security;
 using EnvKit.Core.Variables;
 
 namespace EnvKit.Cli.Commands;
@@ -18,15 +19,22 @@ internal static class VarCommands
     private static Command List(CliServices services)
     {
         var scope = Options.ScopeFilter();
-        var command = new Command("list", "List persistent variables.") { scope };
+        var showSecrets = new Option<bool>("--show-secrets")
+        {
+            Description = "Print values that look like tokens or passwords instead of masking them.",
+        };
+        var command = new Command("list", "List persistent variables.") { scope, showSecrets };
         command.SetAction(result =>
         {
+            var reveal = result.GetValue(showSecrets);
             foreach (var current in Options.Scopes(result.GetValue(scope)))
             {
                 services.Out.WriteLine($"{current}:");
                 foreach (var variable in services.Store.GetAll(current).OrderBy(v => v.Name, EnvVariable.NameComparer))
                 {
-                    var value = variable.Value.Length > ListValueWidth ? variable.Value[..ListValueWidth] + "..." : variable.Value;
+                    var value = !reveal && SecretDetector.LooksSecret(variable.Name, variable.Value) ? SecretDetector.AsciiMask
+                        : variable.Value.Length > ListValueWidth ? variable.Value[..ListValueWidth] + "..."
+                        : variable.Value;
                     var marker = variable.Kind == EnvValueKind.Expandable ? " (expand)" : string.Empty;
                     services.Out.WriteLine($"  {variable.Name}{marker} = {value}");
                 }

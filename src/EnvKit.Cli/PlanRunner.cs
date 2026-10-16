@@ -1,5 +1,4 @@
 using EnvKit.Core;
-using EnvKit.Core.Paths;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Variables;
 
@@ -81,30 +80,12 @@ internal static class PlanPrinter
     public static void Print(ChangePlan plan, TextWriter output)
     {
         output.WriteLine(plan.Description);
-        foreach (var change in plan.Changes.Cast<VariableChange>())
+        foreach (var change in PlanSummary.Summarize(plan))
         {
-            output.WriteLine($@"  {change.Scope}\{change.Name}{Header(change)}");
-            if (EnvVariable.NameComparer.Equals(change.Name, PathAnalyzer.VariableName))
+            output.WriteLine($"  {change.Title}{(change.Note.Length == 0 ? string.Empty : $" ({change.Note})")}");
+            foreach (var line in change.Lines)
             {
-                foreach (var line in PathDiff.Compute(change.Before?.Value, change.After?.Value))
-                {
-                    if (line.Kind != DiffKind.Unchanged)
-                    {
-                        output.WriteLine($"    {(line.Kind == DiffKind.Added ? '+' : '-')} {Format.Entry(line.Text)}");
-                    }
-                }
-            }
-            else
-            {
-                if (change.Before is { } before)
-                {
-                    output.WriteLine($"    - {before.Value}");
-                }
-
-                if (change.After is { } after)
-                {
-                    output.WriteLine($"    + {after.Value}");
-                }
+                output.WriteLine($"    {(line.Kind == DiffKind.Added ? '+' : '-')} {Format.Entry(line.Text)}");
             }
         }
 
@@ -113,19 +94,11 @@ internal static class PlanPrinter
             output.WriteLine("  (requires administrator rights)");
         }
     }
-
-    private static string Header(VariableChange change) => (change.Before, change.After) switch
-    {
-        (null, _) => " (new)",
-        (_, null) => " (delete)",
-        ({ } b, { } a) when b.Kind != a.Kind => $" ({Format.Kind(b.Kind)} -> {Format.Kind(a.Kind)})",
-        _ => string.Empty,
-    };
 }
 
 internal static class Format
 {
-    public static string Kind(EnvValueKind kind) => kind == EnvValueKind.Expandable ? "REG_EXPAND_SZ" : "REG_SZ";
+    public static string Kind(EnvValueKind kind) => kind.RegistryName();
 
     public static string Entry(string raw) => raw.Trim().Length == 0 ? "(empty)" : raw;
 }

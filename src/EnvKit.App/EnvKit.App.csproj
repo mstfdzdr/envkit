@@ -5,11 +5,21 @@
     <TargetFramework>$(WindowsTfm)</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>EnvKit</AssemblyName>
+    <RootNamespace>EnvKit.App</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="WPF-UI" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EnvKit.Core\EnvKit.Core.csproj" />
     <ProjectReference Include="..\EnvKit.Windows\EnvKit.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EnvKit.App.Tests" />
   </ItemGroup>
 
 </Project>

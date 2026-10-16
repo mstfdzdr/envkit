@@ -1,0 +1,37 @@
+using EnvKit.Core.IO;
+using EnvKit.Core.Plans;
+using EnvKit.Core.Snapshots;
+using EnvKit.Core.Variables;
+using EnvKit.Windows.Security;
+using EnvKit.Windows.Variables;
+
+namespace EnvKit.App;
+
+public sealed class AppServices
+{
+    public required IEnvStore Store { get; init; }
+
+    public required IFileSystem FileSystem { get; init; }
+
+    public required ISnapshotStore Snapshots { get; init; }
+
+    public required IEnvChangeBroadcaster Broadcaster { get; init; }
+
+    /// <summary>Variables Windows supplies outside the registry; see <see cref="EnvLookup"/>.</summary>
+    public required Func<string, string?> SystemFallback { get; init; }
+
+    public static AppServices CreateDefault() => new()
+    {
+        Store = new RegistryEnvStore(),
+        FileSystem = PhysicalFileSystem.Instance,
+        Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
+        Broadcaster = new SettingChangeBroadcaster(),
+        SystemFallback = Environment.GetEnvironmentVariable,
+    };
+
+    public EnvLookup Lookup() => new(Store, SystemFallback);
+
+    public PlanBuilder NewPlan() => new(Store);
+
+    public PlanApplier Applier() => new(Store, Snapshots, Broadcaster);
+}
