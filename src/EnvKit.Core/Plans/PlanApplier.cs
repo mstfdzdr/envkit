@@ -1,4 +1,5 @@
 using EnvKit.Core.Credentials;
+using EnvKit.Core.IO;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
 
@@ -11,11 +12,13 @@ public sealed record PlanResult(SnapshotInfo? Snapshot, bool Broadcast);
 /// <param name="snapshots"><see langword="null"/> to skip the snapshot (the elevated helper: its caller already took one).</param>
 /// <param name="broadcaster"><see langword="null"/> to leave notifying to the caller.</param>
 /// <param name="credentials">Required only for plans with credential changes.</param>
+/// <param name="files">Required only for plans with file changes.</param>
 public sealed class PlanApplier(
     IEnvStore store,
     ISnapshotStore? snapshots,
     IEnvChangeBroadcaster? broadcaster,
     ICredentialStore? credentials = null,
+    IFileStore? files = null,
     TimeProvider? timeProvider = null)
 {
     /// <summary>
@@ -98,6 +101,7 @@ public sealed class PlanApplier(
     {
         VariableChange v => (store.Get(v.Name, v.Scope) is { } current ? new VariableValue(current.Value, current.Kind) : null) == v.Before,
         CredentialChange c => Credentials.Get(c.Key)?.State == c.Before,
+        FileChange f => FileChange.SameBytes(Files.Read(f.Path), f.Before),
         _ => throw new NotSupportedException(change.GetType().Name),
     };
 
@@ -136,6 +140,18 @@ public sealed class PlanApplier(
 
                 break;
 
+            case FileChange f:
+                if ((forward ? f.After : f.Before) is { } content)
+                {
+                    Files.Write(f.Path, content);
+                }
+                else
+                {
+                    Files.Delete(f.Path);
+                }
+
+                break;
+
             default:
                 throw new NotSupportedException(change.GetType().Name);
         }
@@ -143,6 +159,9 @@ public sealed class PlanApplier(
 
     private ICredentialStore Credentials =>
         credentials ?? throw new InvalidOperationException("This plan changes credentials, but no credential store was given.");
+
+    private IFileStore Files =>
+        files ?? throw new InvalidOperationException("This plan changes files, but no file store was given.");
 
     private List<Exception> TryRevert(IReadOnlyList<PlanChange> applied)
     {

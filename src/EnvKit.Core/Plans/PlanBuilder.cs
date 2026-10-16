@@ -1,4 +1,6 @@
 using EnvKit.Core.Credentials;
+using EnvKit.Core.DotEnv;
+using EnvKit.Core.IO;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
@@ -10,10 +12,40 @@ namespace EnvKit.Core.Plans;
 /// into a single change, and edits that end where they started disappear.
 /// </summary>
 /// <param name="credentials">Required only for credential edits and for restoring snapshots that contain credentials.</param>
-public sealed class PlanBuilder(IEnvStore store, ICredentialStore? credentials = null, TimeProvider? timeProvider = null)
+/// <param name="files">Required only for .env and user-secrets edits and for restoring snapshots that contain files.</param>
+public sealed class PlanBuilder(
+    IEnvStore store,
+    ICredentialStore? credentials = null,
+    IFileStore? files = null,
+    TimeProvider? timeProvider = null)
 {
     private readonly List<Pending> _pending = [];
     private readonly List<PendingCredential> _pendingCredentials = [];
+    private readonly List<PendingFile> _pendingFiles = [];
+
+    /// <summary>Edits a .env file (created if missing); repeated edits build on each other.</summary>
+    /// <exception cref="InvalidDataException">The file is not valid UTF-8.</exception>
+    public PlanBuilder EditDotEnv(string path, Action<DotEnvDocument> edit)
+    {
+        ArgumentNullException.ThrowIfNull(edit);
+        var pending = TrackFile(path, FileFormat.DotEnv);
+        var file = pending.After is null ? DotEnvFile.Empty() : DotEnvFile.Parse(pending.After);
+        edit(file.Document);
+        pending.After = file.ToBytes();
+        return this;
+    }
+
+    /// <summary>Edits a user-secrets file (created if missing).</summary>
+    /// <exception cref="System.Text.Json.JsonException">The file is not a JSON object.</exception>
+    public PlanBuilder EditUserSecrets(string path, Action<UserSecretsDocument> edit)
+    {
+        ArgumentNullException.ThrowIfNull(edit);
+        var pending = TrackFile(path, FileFormat.UserSecrets);
+        var document = UserSecretsDocument.Parse(pending.After);
+        edit(document);
+        pending.After = document.ToBytes();
+        return this;
+    }
 
     /// <summary>Creates or replaces a generic credential.</summary>
     public PlanBuilder SetCredential(CredentialKey key, CredentialState state)
@@ -149,6 +181,14 @@ public sealed class PlanBuilder(IEnvStore store, ICredentialStore? credentials =
             }
         }
 
+        if (onlyScope is null && files is not null)
+        {
+            foreach (var file in snapshot.FileList)
+            {
+                TrackFile(file.Path, file.Format).After = file.Content;
+            }
+        }
+
         return this;
     }
 
@@ -161,6 +201,9 @@ public sealed class PlanBuilder(IEnvStore store, ICredentialStore? credentials =
             .Concat(_pendingCredentials
                 .Where(p => p.Before != p.After)
                 .Select(PlanChange (p) => new CredentialChange(p.Key, p.Before, p.After)))
+            .Concat(_pendingFiles
+                .Where(p => !FileChange.SameBytes(p.Before, p.After))
+                .Select(PlanChange (p) => new FileChange(p.Path, p.Format, p.Before, p.After)))
             .ToList();
         var now = (timeProvider ?? TimeProvider.System).GetUtcNow();
         return new ChangePlan(Guid.NewGuid(), description, now, changes);
@@ -210,6 +253,33 @@ public sealed class PlanBuilder(IEnvStore store, ICredentialStore? credentials =
         var pending = new PendingCredential(stored?.Key ?? key, stored?.State);
         _pendingCredentials.Add(pending);
         return pending;
+    }
+
+    private PendingFile TrackFile(string path, FileFormat format)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        var fullPath = Path.GetFullPath(path);
+        var existing = _pendingFiles.Find(p => string.Equals(p.Path, fullPath, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        var fileStore = files ?? throw new InvalidOperationException("No file store was given.");
+        var pending = new PendingFile(fullPath, format, fileStore.Read(fullPath));
+        _pendingFiles.Add(pending);
+        return pending;
+    }
+
+    private sealed class PendingFile(string path, FileFormat format, byte[]? before)
+    {
+        public string Path { get; } = path;
+
+        public FileFormat Format { get; } = format;
+
+        public byte[]? Before { get; } = before;
+
+        public byte[]? After { get; set; } = before;
     }
 
     private sealed class PendingCredential(CredentialKey key, CredentialState? before)

@@ -1,4 +1,5 @@
 using EnvKit.Core.Credentials;
+using EnvKit.Core.IO;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
 
@@ -18,7 +19,7 @@ public interface IElevation
 
 /// <summary>
 /// Applies a plan, elevating only for its machine-scope part when this process cannot.
-/// Everything else (user variables, credentials) is written here rather than by the helper:
+/// Everything else (user variables, credentials, files) is written here rather than by the helper:
 /// if the prompt is answered with another administrator's credentials, the helper's HKCU and
 /// Credential Manager belong to that administrator.
 /// </summary>
@@ -28,6 +29,7 @@ public sealed class PlanExecutor(
     IEnvChangeBroadcaster broadcaster,
     IElevation elevation,
     ICredentialStore? credentials = null,
+    IFileStore? files = null,
     TimeProvider? timeProvider = null)
 {
     public PlanResult Execute(ChangePlan plan)
@@ -35,10 +37,10 @@ public sealed class PlanExecutor(
         ArgumentNullException.ThrowIfNull(plan);
         if (plan.IsEmpty || !plan.RequiresElevation || elevation.IsElevated)
         {
-            return new PlanApplier(store, snapshots, broadcaster, credentials, timeProvider).Apply(plan);
+            return new PlanApplier(store, snapshots, broadcaster, credentials, files, timeProvider).Apply(plan);
         }
 
-        var local = new PlanApplier(store, snapshots: null, broadcaster: null, credentials, timeProvider);
+        var local = new PlanApplier(store, snapshots: null, broadcaster: null, credentials, files, timeProvider);
 
         // Fail before showing a UAC prompt for a plan that cannot apply anyway.
         local.EnsureCurrent(plan.Changes);

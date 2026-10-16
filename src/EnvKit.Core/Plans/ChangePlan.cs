@@ -11,6 +11,7 @@ namespace EnvKit.Core.Plans;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(VariableChange), "variable")]
 [JsonDerivedType(typeof(CredentialChange), "credential")]
+[JsonDerivedType(typeof(FileChange), "file")]
 public abstract record PlanChange
 {
     [JsonIgnore]
@@ -47,6 +48,32 @@ public sealed record CredentialChange(CredentialKey Key, CredentialState? Before
     /// </summary>
     [JsonIgnore]
     public bool IsIrreversible => Before is { Secret: null };
+}
+
+public enum FileFormat
+{
+    DotEnv,
+    UserSecrets,
+}
+
+/// <summary>
+/// A whole-file change. The before bytes are the precondition, so an edit made by another
+/// program after the preview stops the plan instead of being overwritten.
+/// </summary>
+/// <param name="Before"><see langword="null"/> when the file is being created.</param>
+/// <param name="After"><see langword="null"/> when the file is being deleted.</param>
+public sealed record FileChange(string Path, FileFormat Format, byte[]? Before, byte[]? After) : PlanChange
+{
+    public override bool RequiresElevation => false;
+
+    public override string Subject => $"{(Format == FileFormat.DotEnv ? ".env" : "user secrets")} {Path}";
+
+    public bool Equals(FileChange? other) =>
+        other is not null && Path == other.Path && Format == other.Format && SameBytes(Before, other.Before) && SameBytes(After, other.After);
+
+    public override int GetHashCode() => HashCode.Combine(Path, Format, Before?.Length, After?.Length);
+
+    internal static bool SameBytes(byte[]? a, byte[]? b) => a is null ? b is null : b is not null && a.AsSpan().SequenceEqual(b);
 }
 
 public sealed record ChangePlan(Guid Id, string Description, DateTimeOffset CreatedAt, IReadOnlyList<PlanChange> Changes)

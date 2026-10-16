@@ -1,4 +1,6 @@
+using EnvKit.Core.DotEnv;
 using EnvKit.Core.Paths;
+using EnvKit.Core.Security;
 using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Plans;
@@ -18,8 +20,88 @@ public static class PlanSummary
         {
             VariableChange v => Summarize(v),
             CredentialChange c => Summarize(c),
+            FileChange f => Summarize(f),
             _ => new ChangeSummary(change.Subject, string.Empty, []),
         })];
+    }
+
+    /// <summary>Per-key diff of a .env or secrets.json file; values that look secret are never shown.</summary>
+    public static ChangeSummary Summarize(FileChange change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        var note = (change.Before, change.After) switch
+        {
+            (null, _) => "new file",
+            (_, null) => "delete file",
+            _ => string.Empty,
+        };
+
+        var before = ReadKeys(change.Format, change.Before);
+        var after = ReadKeys(change.Format, change.After);
+        if (before is null || after is null)
+        {
+            return new ChangeSummary(change.Subject, note, [new DiffLine(DiffKind.Added, "content changed")]);
+        }
+
+        var comparer = change.Format == FileFormat.DotEnv ? StringComparer.Ordinal : UserSecretsDocument.KeyComparer;
+        var old = before.ToDictionary(p => p.Key, p => p.Value, comparer);
+        var @new = after.ToDictionary(p => p.Key, p => p.Value, comparer);
+
+        static string Show(string key, string value) =>
+            SecretDetector.LooksSecret(key, value) ? $"{key} = {SecretDetector.AsciiMask}" : $"{key} = {value}";
+
+        var lines = new List<DiffLine>();
+        foreach (var key in old.Keys.Concat(@new.Keys).Distinct(comparer))
+        {
+            var had = old.TryGetValue(key, out var oldValue);
+            var has = @new.TryGetValue(key, out var newValue);
+            if (had && has && oldValue == newValue)
+            {
+                continue;
+            }
+
+            if (had && has && (SecretDetector.LooksSecret(key, oldValue!) || SecretDetector.LooksSecret(key, newValue!)))
+            {
+                lines.Add(new DiffLine(DiffKind.Added, $"{key}: changed"));
+                continue;
+            }
+
+            if (had)
+            {
+                lines.Add(new DiffLine(DiffKind.Removed, Show(key, oldValue!)));
+            }
+
+            if (has)
+            {
+                lines.Add(new DiffLine(DiffKind.Added, Show(key, newValue!)));
+            }
+        }
+
+        if (lines.Count == 0)
+        {
+            lines.Add(new DiffLine(DiffKind.Added, "formatting changed"));
+        }
+
+        return new ChangeSummary(change.Subject, note, lines);
+    }
+
+    private static IReadOnlyList<KeyValuePair<string, string>>? ReadKeys(FileFormat format, byte[]? content)
+    {
+        if (content is null)
+        {
+            return [];
+        }
+
+        try
+        {
+            return format == FileFormat.DotEnv
+                ? DotEnvFile.Parse(content).Document.Values()
+                : UserSecretsDocument.Parse(content).Values();
+        }
+        catch (Exception ex) when (ex is InvalidDataException or System.Text.Json.JsonException)
+        {
+            return null;
+        }
     }
 
     /// <summary>Describes what changes about the secret without ever including it.</summary>
