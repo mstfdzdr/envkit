@@ -1,8 +1,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
-# Template: fill in the version and the installer's SHA-256, then submit to
-# microsoft/winget-pkgs (see packaging/winget/README.md).
+# Update the version, URL and SHA-256 for each release (see packaging/winget/README.md).
 PackageIdentifier: mstfdzdr.EnvKit
-PackageVersion: 0.1.0
+PackageVersion: 0.4.0
 InstallerType: exe
 Scope: user
 InstallModes:
@@ -16,7 +15,7 @@ Commands:
   - envkit
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/mstfdzdr/envkit/releases/download/v0.1.0/EnvKit-win-Setup.exe
-    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    InstallerUrl: https://github.com/mstfdzdr/envkit/releases/download/v0.4.0/EnvKit-win-Setup.exe
+    InstallerSha256: 7DD7C8F36EA67E6BC2597909C3EE589BE103C0425DE64464B48207D1B0D4DEC1
 ManifestType: installer
 ManifestVersion: 1.9.0
