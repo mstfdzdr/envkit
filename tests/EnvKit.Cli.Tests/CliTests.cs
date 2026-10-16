@@ -38,6 +38,10 @@ public sealed class CliTests : IDisposable
         {
             Store = _store,
             Credentials = _credentials,
+            Vault = new InMemoryVault(),
+            Profiles = new InMemoryProfileStore(),
+            Processes = new RecordingProcessRunner(),
+            ProcessEnvironment = () => new Dictionary<string, string>(),
             In = _input,
             FileSystem = _fileSystem,
             Snapshots = _snapshots,
@@ -176,6 +180,10 @@ public sealed class CliTests : IDisposable
             {
                 Store = store,
                 Credentials = _credentials,
+                Vault = new InMemoryVault(),
+                Profiles = new InMemoryProfileStore(),
+                Processes = new RecordingProcessRunner(),
+                ProcessEnvironment = () => new Dictionary<string, string>(),
                 In = _input,
                 FileSystem = _fileSystem,
                 Snapshots = _snapshots,
@@ -204,6 +212,10 @@ public sealed class CliTests : IDisposable
             {
                 Store = new MachineReadOnlyStore(_store),
                 Credentials = _credentials,
+                Vault = new InMemoryVault(),
+                Profiles = new InMemoryProfileStore(),
+                Processes = new RecordingProcessRunner(),
+                ProcessEnvironment = () => new Dictionary<string, string>(),
                 In = _input,
                 FileSystem = _fileSystem,
                 Snapshots = _snapshots,

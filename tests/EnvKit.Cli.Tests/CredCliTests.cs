@@ -35,6 +35,10 @@ public sealed class CredCliTests : IDisposable
             {
                 Store = _store,
                 Credentials = _credentials,
+                Vault = new InMemoryVault(),
+                Profiles = new InMemoryProfileStore(),
+                Processes = new RecordingProcessRunner(),
+                ProcessEnvironment = () => new Dictionary<string, string>(),
                 FileSystem = new FakeFileSystem(),
                 Snapshots = _snapshots,
                 Broadcaster = new CountingBroadcaster(),
@@ -100,7 +104,8 @@ public sealed class CredCliTests : IDisposable
     [Fact]
     public void Set_reads_stdin_when_asked_and_creates_new_credentials()
     {
-        Assert.Equal(0, RunWithInput("s3cret\n", "cred", "set", "my-app/token", "--user", "bot", "--password-stdin", "--yes"));
+        // With the byte order mark Windows PowerShell puts in front of piped text.
+        Assert.Equal(0, RunWithInput("﻿s3cret\n", "cred", "set", "my-app/token", "--user", "bot", "--password-stdin", "--yes"));
 
         var created = _credentials.Get(new CredentialKey("my-app/token", CredentialKind.Generic))!.State;
         Assert.Equal("s3cret", created.SecretText);

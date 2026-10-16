@@ -115,7 +115,7 @@ internal static class CredCommands
             string? password;
             if (result.GetValue(fromStdin))
             {
-                password = services.In.ReadLine();
+                password = StandardInput.ReadLine(services.In);
             }
             else if (services.Prompt.IsInteractive)
             {

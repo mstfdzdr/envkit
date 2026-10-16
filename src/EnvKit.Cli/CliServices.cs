@@ -2,8 +2,10 @@ using EnvKit.Core.Credentials;
 using EnvKit.Core.IO;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Plans;
+using EnvKit.Core.Profiles;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
+using EnvKit.Core.Vault;
 using EnvKit.Windows.Credentials;
 using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
@@ -68,6 +70,15 @@ public sealed class CliServices
 
     public required ICredentialStore Credentials { get; init; }
 
+    public required IVault Vault { get; init; }
+
+    public required IProfileStore Profiles { get; init; }
+
+    public required IProcessRunner Processes { get; init; }
+
+    /// <summary>The environment <c>envkit run</c> starts from: this process's.</summary>
+    public required Func<IReadOnlyDictionary<string, string>> ProcessEnvironment { get; init; }
+
     public required IFileSystem FileSystem { get; init; }
 
     public required ISnapshotStore Snapshots { get; init; }
@@ -92,6 +103,10 @@ public sealed class CliServices
     {
         Store = new RegistryEnvStore(),
         Credentials = new WindowsCredentialStore(),
+        Vault = new FileVault(FileVault.DefaultPath, new DpapiProtector()),
+        Profiles = new FileProfileStore(FileProfileStore.DefaultDirectory),
+        Processes = new ProcessRunner(),
+        ProcessEnvironment = ProcessRunner.CurrentEnvironment,
         FileSystem = PhysicalFileSystem.Instance,
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
         Broadcaster = new SettingChangeBroadcaster(),

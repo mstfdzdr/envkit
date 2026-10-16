@@ -11,6 +11,9 @@ public static class EnvKitCli
         WhichCommand.Create(services),
         VarCommands.Create(services),
         CredCommands.Create(services),
+        ProfileCommands.Create(services),
+        VaultCommands.Create(services),
+        RunCommand.Create(services),
         SnapshotCommands.Create(services),
         ApplyPlanCommand.Create(services),
     };
