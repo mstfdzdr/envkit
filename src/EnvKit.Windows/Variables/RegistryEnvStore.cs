@@ -47,6 +47,7 @@ public sealed class RegistryEnvStore(RegistryLocation user, RegistryLocation mac
     public void Set(EnvVariable variable)
     {
         ArgumentNullException.ThrowIfNull(variable);
+        variable.EnsureWritable();
         var kind = variable.Kind == EnvValueKind.Expandable ? RegistryValueKind.ExpandString : RegistryValueKind.String;
         Write(variable.Scope, key => key.SetValue(variable.Name, variable.Value, kind));
     }
@@ -119,7 +120,7 @@ public sealed class RegistryEnvStore(RegistryLocation user, RegistryLocation mac
         }
         catch (ArgumentException)
         {
-            // The unnamed default value, or a name/length Windows would never hand to a process.
+            // The unnamed default value, or a name Windows would never hand to a process.
             return null;
         }
     }

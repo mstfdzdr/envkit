@@ -31,11 +31,6 @@ public sealed record EnvVariable
     {
         ValidateName(name);
         ArgumentNullException.ThrowIfNull(value);
-        if (value.Length > MaxValueLength)
-        {
-            throw new ArgumentException(
-                $"Value is {value.Length} characters; the maximum is {MaxValueLength}.", nameof(value));
-        }
 
         Name = name;
         Value = value;
@@ -50,6 +45,21 @@ public sealed record EnvVariable
     public EnvScope Scope { get; }
 
     public EnvValueKind Kind { get; }
+
+    /// <summary>
+    /// The registry can hold longer values than a process environment accepts. Such values are
+    /// still read (so they can be reported) but must not be written.
+    /// </summary>
+    public bool ExceedsMaxLength => Value.Length > MaxValueLength;
+
+    public void EnsureWritable()
+    {
+        if (ExceedsMaxLength)
+        {
+            throw new ArgumentException(
+                $"{Name} is {Value.Length} characters; the maximum is {MaxValueLength}.");
+        }
+    }
 
     public static void ValidateName(string name)
     {

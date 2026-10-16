@@ -13,17 +13,22 @@ public class EnvVariableTests
         Assert.ThrowsAny<ArgumentException>(() => new EnvVariable(name, "x", EnvScope.User));
 
     [Fact]
-    public void Accepts_value_at_max_length()
+    public void Value_at_max_length_is_writable()
     {
         var variable = new EnvVariable("X", new string('a', EnvVariable.MaxValueLength), EnvScope.User);
 
-        Assert.Equal(EnvVariable.MaxValueLength, variable.Value.Length);
+        Assert.False(variable.ExceedsMaxLength);
+        variable.EnsureWritable();
     }
 
     [Fact]
-    public void Rejects_value_over_max_length() =>
-        Assert.Throws<ArgumentException>(
-            () => new EnvVariable("X", new string('a', EnvVariable.MaxValueLength + 1), EnvScope.User));
+    public void Overlong_value_can_be_represented_but_not_written()
+    {
+        var variable = new EnvVariable("X", new string('a', EnvVariable.MaxValueLength + 1), EnvScope.User);
+
+        Assert.True(variable.ExceedsMaxLength);
+        Assert.Throws<ArgumentException>(variable.EnsureWritable);
+    }
 
     [Fact]
     public void Defaults_to_literal_kind() =>

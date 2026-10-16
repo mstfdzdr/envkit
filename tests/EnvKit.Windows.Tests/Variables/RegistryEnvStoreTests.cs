@@ -94,6 +94,21 @@ public sealed class RegistryEnvStoreTests : IDisposable
     }
 
     [Fact]
+    public void Overlong_registry_value_is_read_but_not_writable()
+    {
+        var overlong = new string('a', EnvVariable.MaxValueLength + 1);
+        using (var key = Registry.CurrentUser.CreateSubKey(_root + @"\User"))
+        {
+            key.SetValue("HUGE", overlong);
+        }
+
+        var read = _store.Get("HUGE", EnvScope.User);
+
+        Assert.True(read?.ExceedsMaxLength);
+        Assert.Throws<ArgumentException>(() => _store.Set(read!));
+    }
+
+    [Fact]
     public void Delete_reports_whether_the_variable_existed()
     {
         _store.Set(new EnvVariable("GONE", "1", EnvScope.User));

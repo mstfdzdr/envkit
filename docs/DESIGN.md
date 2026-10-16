@@ -87,7 +87,9 @@ Düzenleme, dosyanın geri kalanına dokunmadan yapılmalı:
 ## Veri modeli (özet)
 
 - `EnvVariable { Name, Value, Scope(User|Machine), Kind(Literal|Expandable) }`
-- `PathEntry { Raw, Expanded, Scope, Index, Issues[] }`
+- `PathEntry { Raw, Expanded, Directory, Scope, Index }` + `PathReport { Entries, Issues[] }`
+  - Sorun türleri: `Empty`, `Missing`, `Duplicate`, `Quoted`, `UnresolvedVariable`, `NotExpanded` (REG_SZ PATH içinde `%VAR%`), `NotFullyQualified`, `ValueTooLong`
+  - Makine değişkenleri kullanıcı değişkenlerinden önce expand edilir; System PATH kullanıcıya özel bir değişkeni referanslayamaz.
 - `ChangePlan { Id, Operations[], RequiresElevation }`
   - Operasyonlar: `SetVar`, `DeleteVar`, `PathInsert`, `PathRemove`, `PathMove`, `CredWrite`, `CredDelete`, `DotEnvSet`, `DotEnvDelete`, `DotEnvRename`
 - `Snapshot { Id, CreatedAt, Reason, PlanId, State }`
