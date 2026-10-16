@@ -43,6 +43,16 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
+      <ui:Button Grid.Column="0"
+                 Margin="8,0,8,16"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Bottom"
+                 Appearance="Primary"
+                 Icon="{ui:SymbolIcon ArrowClockwise24}"
+                 Content="{Binding UpdateLabel}"
+                 Command="{Binding RestartToUpdateCommand}"
+                 Visibility="{Binding PendingUpdate, Converter={StaticResource NullToVisibility}}" />
+
       <ListBox Grid.Column="0"
                Margin="8,0,8,8"
                Background="Transparent"

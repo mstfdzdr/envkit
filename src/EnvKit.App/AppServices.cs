@@ -23,8 +23,12 @@ public sealed class AppServices
 
     public required IElevation Elevation { get; init; }
 
+    /// <summary><see langword="null"/> disables update checks.</summary>
+    public IAppUpdater? Updater { get; init; }
+
     public static AppServices CreateDefault() => new()
     {
+        Updater = new VelopackUpdater(),
         Store = new RegistryEnvStore(),
         FileSystem = PhysicalFileSystem.Instance,
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),

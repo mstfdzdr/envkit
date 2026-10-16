@@ -11,9 +11,12 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        var window = new MainWindow { DataContext = new MainViewModel(AppServices.CreateDefault()) };
+        var viewModel = new MainViewModel(AppServices.CreateDefault());
+        var window = new MainWindow { DataContext = viewModel };
         ApplicationThemeManager.ApplySystemTheme();
         SystemThemeWatcher.Watch(window);
         window.Show();
+
+        _ = viewModel.CheckForUpdatesAsync();
     }
 }

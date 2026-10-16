@@ -1,3 +1,4 @@
+using System.Net.Http;
 using EnvKit.App.ViewModels;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Variables;
@@ -19,8 +20,9 @@ public class ViewModelTests
         _store.Set(new EnvVariable("GITHUB_TOKEN", "ghp_secret", EnvScope.User));
     }
 
-    private MainViewModel CreateMain(IEnvStore? store = null, FakeElevation? elevation = null) => new(new AppServices
+    private MainViewModel CreateMain(IEnvStore? store = null, FakeElevation? elevation = null, IAppUpdater? updater = null) => new(new AppServices
     {
+        Updater = updater,
         Store = store ?? _store,
         FileSystem = new FakeFileSystem().WithDirectories(@"C:\Windows", @"C:\a", @"C:\b"),
         Snapshots = _snapshots,
@@ -151,6 +153,30 @@ public class ViewModelTests
     }
 
     [Fact]
+    public async Task Downloaded_update_offers_a_restart()
+    {
+        var updater = new FakeUpdater { Version = "0.2.0" };
+        var main = CreateMain(updater: updater);
+
+        await main.CheckForUpdatesAsync();
+        Assert.Equal("Restart to update to 0.2.0", main.UpdateLabel);
+
+        main.RestartToUpdateCommand.Execute(null);
+        Assert.True(updater.Applied);
+    }
+
+    [Fact]
+    public async Task Failed_update_check_is_silent()
+    {
+        var main = CreateMain(updater: new FakeUpdater { Failure = new HttpRequestException("offline") });
+
+        await main.CheckForUpdatesAsync();
+
+        Assert.Null(main.PendingUpdate);
+        Assert.False(main.IsStatusOpen);
+    }
+
+    [Fact]
     public void Secrets_are_masked_and_locked_until_revealed()
     {
         var variables = CreateMain().Variables;
@@ -213,5 +239,19 @@ public class ViewModelTests
         history.RestoreCommand.Execute(null);
         await main.Review!.ApplyCommand.ExecuteAsync(null);
         Assert.Equal(@"C:\a;;C:\b;C:\a", UserPath);
+    }
+
+    private sealed class FakeUpdater : IAppUpdater
+    {
+        public string? Version { get; init; }
+
+        public Exception? Failure { get; init; }
+
+        public bool Applied { get; private set; }
+
+        public Task<string?> DownloadUpdateAsync() =>
+            Failure is null ? Task.FromResult(Version) : Task.FromException<string?>(Failure);
+
+        public void ApplyAndRestart() => Applied = true;
     }
 }

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using EnvKit.Core;
 using EnvKit.Core.Plans;
 using Wpf.Ui.Controls;
@@ -55,6 +56,35 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     public partial InfoBarSeverity StatusSeverity { get; set; }
+
+    /// <summary>Set once a newer release has been downloaded and is ready to install.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UpdateLabel))]
+    public partial string? PendingUpdate { get; set; }
+
+    public string UpdateLabel => $"Restart to update to {PendingUpdate}";
+
+    /// <summary>Best effort: offline or rate-limited simply means no update this time.</summary>
+    public async Task CheckForUpdatesAsync()
+    {
+        if (_services.Updater is not { } updater)
+        {
+            return;
+        }
+
+        try
+        {
+            PendingUpdate = await updater.DownloadUpdateAsync();
+        }
+#pragma warning disable CA1031 // Failures are network or feed problems the user cannot act on.
+        catch (Exception)
+#pragma warning restore CA1031
+        {
+        }
+    }
+
+    [RelayCommand]
+    private void RestartToUpdate() => _services.Updater?.ApplyAndRestart();
 
     public void RequestReview(ChangePlan plan)
     {

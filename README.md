@@ -1,5 +1,7 @@
 # EnvKit
 
+[![CI](https://github.com/mstfdzdr/envkit/actions/workflows/ci.yml/badge.svg)](https://github.com/mstfdzdr/envkit/actions/workflows/ci.yml)
+
 Manage Windows environment variables and PATH without the guesswork: see what is broken,
 preview every change as a diff, and undo anything.
 
@@ -29,8 +31,9 @@ can silently break `%VARIABLE%` references. EnvKit does those things:
 
 ## Install
 
-Download `EnvKit-win-Setup.exe` from the latest release. It installs per user (no
-administrator rights) and adds `envkit` to your user PATH. A winget package is on the way.
+Download `EnvKit-win-Setup.exe` from the [latest release](https://github.com/mstfdzdr/envkit/releases/latest).
+It installs per user (no administrator rights), adds `envkit` to your user PATH and updates
+itself from GitHub Releases. A winget package is on the way.
 
 ## CLI
 
