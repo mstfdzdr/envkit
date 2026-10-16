@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EnvKit.App/EnvKit.App.csproj" />
+    <Project Path="src/EnvKit.Cli/EnvKit.Cli.csproj" />
+    <Project Path="src/EnvKit.Core/EnvKit.Core.csproj" />
+    <Project Path="src/EnvKit.Windows/EnvKit.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EnvKit.Core.Tests/EnvKit.Core.Tests.csproj" />
+  </Folder>
+</Solution>

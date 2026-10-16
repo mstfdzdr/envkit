@@ -1,0 +1,17 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{csproj,props,targets,slnx,xml,xaml,json,yml,yaml}]
+indent_size = 2
+
+[*.cs]
+# Only matters for VB consumers; this codebase is C#-only.
+dotnet_diagnostic.CA1716.severity = none
+# Test method names use underscores.
+dotnet_diagnostic.CA1707.severity = none

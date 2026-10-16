@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>$(WindowsTfm)</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>EnvKit</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EnvKit.Core\EnvKit.Core.csproj" />
+    <ProjectReference Include="..\EnvKit.Windows\EnvKit.Windows.csproj" />
+  </ItemGroup>
+
+</Project>
