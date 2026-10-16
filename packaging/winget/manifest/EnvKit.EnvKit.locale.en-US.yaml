@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
+PackageIdentifier: EnvKit.EnvKit
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: EnvKit contributors
+PublisherUrl: https://github.com/OWNER/REPO
+PackageName: EnvKit
+PackageUrl: https://github.com/OWNER/REPO
+License: MIT
+LicenseUrl: https://github.com/OWNER/REPO/blob/main/LICENSE
+ShortDescription: Manage Windows environment variables and PATH safely, with previews and undo.
+Description: |-
+  EnvKit is a desktop app and CLI (envkit) for Windows environment variables. It finds dead,
+  duplicate and shadowing PATH entries, shows a diff before every change, snapshots the state
+  so any change can be undone, and only asks for administrator rights for machine-scope edits.
+Tags:
+  - environment-variables
+  - path
+  - developer-tools
+  - cli
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0

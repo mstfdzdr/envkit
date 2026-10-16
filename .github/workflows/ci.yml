@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # The Windows tests use the registry (throwaway HKCU keys) and DPAPI.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build
+        run: dotnet build EnvKit.slnx -c Release
+
+      - name: Test
+        run: dotnet test EnvKit.slnx -c Release --no-build

@@ -6,10 +6,14 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>EnvKit</AssemblyName>
     <RootNamespace>EnvKit.App</RootNamespace>
+    <!-- Program.Main runs the installer hooks before WPF starts. -->
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <StartupObject>EnvKit.App.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Velopack" />
     <PackageReference Include="WPF-UI" />
   </ItemGroup>
 

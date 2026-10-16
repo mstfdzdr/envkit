@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Principal;
 using System.Text.Json;
+using EnvKit.Core;
 using EnvKit.Core.Plans;
 
 namespace EnvKit.Windows.Elevation;
@@ -14,8 +15,7 @@ public sealed class WindowsElevation(string helperPath, string plansDirectory) :
     private const int ErrorCancelled = 1223;
     private static readonly TimeSpan HelperTimeout = TimeSpan.FromMinutes(2);
 
-    public static string DefaultPlansDirectory { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EnvKit", "plans");
+    public static string DefaultPlansDirectory => EnvKitPaths.Plans;
 
     public static WindowsElevation ForCurrentProcess() =>
         new(Environment.ProcessPath ?? throw new InvalidOperationException("Unknown process path."), DefaultPlansDirectory);

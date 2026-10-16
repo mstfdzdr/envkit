@@ -15,8 +15,7 @@ public sealed class FileSnapshotStore(string directory, ISecretProtector protect
     public const int DefaultRetain = 100;
     private const string Extension = ".snapshot";
 
-    public static string DefaultDirectory { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EnvKit", "snapshots");
+    public static string DefaultDirectory => EnvKitPaths.Snapshots;
 
     public void Save(Snapshot snapshot)
     {

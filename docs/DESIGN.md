@@ -75,7 +75,9 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
 4. **Limitler:** tek değişken ≤ 32.767 karakter; credential blob ≤ 2.560 byte. `setx` (1.024'te keser) kullanılmaz.
 5. **Credential güvenliği:** parolalar varsayılan gizli; "göster" için isteğe bağlı Windows Hello (`UserConsentVerifier`). Export'lara secret yazılmaz.
 6. **Kasa:** DPAPI (CurrentUser); ileride isteğe bağlı master parola (Argon2id + AES-GCM). Secret'lar kalıcı env'e **yazılmaz**; `envkit run --profile api -- dotnet run` ile yalnızca o process'e enjekte edilir.
-7. **Snapshot'lar** `%LOCALAPPDATA%\EnvKit\snapshots\` altında JSON; env değerleri de secret içerebileceğinden DPAPI ile şifreli.
+7. **Snapshot'lar** `%LOCALAPPDATA%\EnvKit.Data\snapshots\` altında JSON; env değerleri de secret içerebileceğinden DPAPI ile şifreli. Kurulum klasöründen (`%LOCALAPPDATA%\EnvKit`, kaldırmada silinir) bilinçli olarak ayrı tutulur ki geri alma geçmişi kaldırmadan sonra da kalsın.
+8. **Secret maskeleme:** Adı veya değeri credential'a benzeyen değişkenler (`*_TOKEN`, `*_API_KEY`, `*_PAT`, `ghp_…` vb.) GUI'de ve `envkit var list`'te maskelenir; açıkça "göster" denmeden görünmez, aranmaz, düzenlenemez.
+9. **Paketleme:** Velopack ile per-user kurulum. `current\` altında masaüstü uygulaması, `current\bin\envkit.exe` tek dosyalık CLI. Kurulum hook'u yalnızca `bin` klasörünü User PATH'e ekler (runtime DLL'leri PATH'e girmez), kaldırma hook'u çıkarır; ikisi de snapshot'lı bir plandır.
 
 ## `.env` ve user-secrets düzenleme (v0.4)
 

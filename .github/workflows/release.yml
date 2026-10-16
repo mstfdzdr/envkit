@@ -1,0 +1,45 @@
+name: Release
+
+# Push a tag like v0.1.0 to build the installer and publish a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: dotnet test EnvKit.slnx -c Release
+
+      - name: Version from tag
+        id: version
+        shell: pwsh
+        run: '"value=$("${{ github.ref_name }}".TrimStart("v"))" >> $env:GITHUB_OUTPUT'
+
+      # Code signing (SignPath) goes here once the project is approved; until then the
+      # installer is unsigned and SmartScreen will warn on first run.
+
+      - name: Pack
+        shell: pwsh
+        run: ./build/pack.ps1 -Version ${{ steps.version.outputs.value }}
+
+      - name: Publish release
+        shell: pwsh
+        run: >
+          dotnet vpk upload github
+          --outputDir artifacts/release
+          --repoUrl ${{ github.server_url }}/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }}
+          --tag ${{ github.ref_name }}
+          --releaseName "EnvKit ${{ steps.version.outputs.value }}"
+          --publish
