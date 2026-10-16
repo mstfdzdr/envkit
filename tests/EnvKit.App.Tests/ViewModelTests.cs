@@ -165,10 +165,27 @@ public class ViewModelTests
         var main = CreateMain(updater: updater);
 
         await main.CheckForUpdatesAsync();
-        Assert.Equal("Restart to update to 0.2.0", main.UpdateLabel);
+        Assert.Equal("Update ready: 0.2.0", main.UpdateLabel);
+        Assert.Equal("Restart to update", main.UpdateAction);
 
-        main.RestartToUpdateCommand.Execute(null);
+        var restart = main.RestartToUpdateCommand.ExecuteAsync(null);
+
+        // Feedback first, so the click never looks like it did nothing.
+        Assert.Equal("Restarting…", main.UpdateAction);
+        Assert.False(main.RestartToUpdateCommand.CanExecute(null));
+        await restart;
         Assert.True(updater.Applied);
+    }
+
+    [Fact]
+    public void First_start_after_an_update_says_so()
+    {
+        var main = CreateMain();
+
+        main.AnnounceUpdate("0.5.0");
+
+        Assert.Equal(InfoBarSeverity.Success, main.StatusSeverity);
+        Assert.Equal("EnvKit is now version 0.5.0.", main.StatusMessage);
     }
 
     [Fact]

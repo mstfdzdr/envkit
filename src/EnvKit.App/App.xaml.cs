@@ -24,6 +24,15 @@ public partial class App : Application
         services.Theme.Apply(settings.Theme);
         window.Show();
 
-        _ = viewModel.CheckForUpdatesAsync();
+        if (Program.UpdatedTo is { } version)
+        {
+            // The updater starts us in the background; come forward and say what happened.
+            viewModel.AnnounceUpdate(version);
+            window.Activate();
+        }
+        else
+        {
+            _ = viewModel.CheckForUpdatesAsync();
+        }
     }
 }

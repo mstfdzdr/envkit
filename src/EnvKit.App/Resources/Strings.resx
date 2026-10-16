@@ -68,7 +68,11 @@
   <data name="Enum_LanguageChoice_English" xml:space="preserve"><value>English</value></data>
   <data name="Enum_LanguageChoice_Turkish" xml:space="preserve"><value>Türkçe</value></data>
   <data name="Main_Navigation" xml:space="preserve"><value>Navigation</value></data>
-  <data name="Main_UpdateLabel" xml:space="preserve"><value>Restart to update to {0}</value></data>
+  <data name="Main_UpdateReady" xml:space="preserve"><value>Update ready: {0}</value></data>
+  <data name="Main_RestartToUpdate" xml:space="preserve"><value>Restart to update</value></data>
+  <data name="Main_Restarting" xml:space="preserve"><value>Restarting…</value></data>
+  <data name="Status_Updated" xml:space="preserve"><value>Updated</value></data>
+  <data name="Status_UpdatedMessage" xml:space="preserve"><value>EnvKit is now version {0}.</value></data>
   <data name="Review_Title" xml:space="preserve"><value>Review changes</value></data>
   <data name="Review_Elevation" xml:space="preserve"><value>Includes machine-scope changes: Windows will ask for administrator approval.</value></data>
   <data name="Review_Irreversible" xml:space="preserve"><value>Some deletions cannot be undone: Windows never reveals the secret of domain credentials.</value></data>

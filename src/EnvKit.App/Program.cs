@@ -14,6 +14,9 @@ public static class Program
     /// <summary>The installer puts the single-file CLI here, alone, so only it lands on PATH.</summary>
     private static string CliDirectory => Path.Combine(AppContext.BaseDirectory, "bin");
 
+    /// <summary>Set when this start is the relaunch right after an update, so the app can say so.</summary>
+    public static string? UpdatedTo { get; private set; }
+
     [STAThread]
     public static int Main(string[] args)
     {
@@ -21,6 +24,7 @@ public static class Program
         VelopackApp.Build()
             .OnAfterInstallFastCallback(_ => UpdateCliPath(add: true))
             .OnBeforeUninstallFastCallback(_ => UpdateCliPath(add: false))
+            .OnRestarted(version => UpdatedTo = version.ToString())
             .Run();
 
         // Relaunched through UAC by WindowsElevation: apply the plan and exit without a window.

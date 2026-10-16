@@ -68,7 +68,11 @@
   <data name="Enum_LanguageChoice_English" xml:space="preserve"><value>English</value></data>
   <data name="Enum_LanguageChoice_Turkish" xml:space="preserve"><value>Türkçe</value></data>
   <data name="Main_Navigation" xml:space="preserve"><value>Gezinme</value></data>
-  <data name="Main_UpdateLabel" xml:space="preserve"><value>{0} için yeniden başlat</value></data>
+  <data name="Main_UpdateReady" xml:space="preserve"><value>Güncelleme hazır: {0}</value></data>
+  <data name="Main_RestartToUpdate" xml:space="preserve"><value>Yeniden başlat ve güncelle</value></data>
+  <data name="Main_Restarting" xml:space="preserve"><value>Yeniden başlatılıyor…</value></data>
+  <data name="Status_Updated" xml:space="preserve"><value>Güncellendi</value></data>
+  <data name="Status_UpdatedMessage" xml:space="preserve"><value>EnvKit {0} sürümüne güncellendi.</value></data>
   <data name="Review_Title" xml:space="preserve"><value>Değişiklikleri incele</value></data>
   <data name="Review_Elevation" xml:space="preserve"><value>Sistem kapsamında değişiklik içeriyor: Windows yönetici onayı isteyecek.</value></data>
   <data name="Review_Irreversible" xml:space="preserve"><value>Bazı silmeler geri alınamaz: Windows etki alanı kimlik bilgilerinin gizli bilgisini hiçbir zaman vermez.</value></data>

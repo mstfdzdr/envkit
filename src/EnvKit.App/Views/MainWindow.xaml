@@ -10,7 +10,7 @@
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance vm:MainViewModel}"
                  Title="EnvKit"
-                 Icon="/Assets/EnvKit.ico"
+                 Icon="pack://application:,,,/EnvKit;component/Assets/EnvKit.ico"
                  Width="1180"
                  Height="760"
                  MinWidth="880"
@@ -54,7 +54,7 @@
 
     <ui:TitleBar Grid.Row="0" Title="EnvKit">
       <ui:TitleBar.Icon>
-        <ui:ImageIcon Source="/Assets/EnvKit-128.png" />
+        <ui:ImageIcon Source="pack://application:,,,/EnvKit;component/Assets/EnvKit-128.png" />
       </ui:TitleBar.Icon>
     </ui:TitleBar>
 
@@ -64,15 +64,23 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
+      <!-- Two short lines, so the version fits the 200px navigation column in both languages. -->
       <ui:Button Grid.Column="0"
                  Margin="8,0,8,16"
+                 Padding="12,8"
                  HorizontalAlignment="Stretch"
+                 HorizontalContentAlignment="Left"
                  VerticalAlignment="Bottom"
                  Appearance="Primary"
                  Icon="{ui:SymbolIcon ArrowClockwise24}"
-                 Content="{Binding UpdateLabel}"
                  Command="{Binding RestartToUpdateCommand}"
-                 Visibility="{Binding PendingUpdate, Converter={StaticResource NullToVisibility}}" />
+                 AutomationProperties.Name="{Binding UpdateLabel}"
+                 Visibility="{Binding PendingUpdate, Converter={StaticResource NullToVisibility}}">
+        <StackPanel>
+          <TextBlock Text="{Binding UpdateLabel}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding UpdateAction}" FontSize="12" TextWrapping="Wrap" Opacity="0.9" />
+        </StackPanel>
+      </ui:Button>
 
       <ListBox Grid.Column="0"
                Margin="8,0,8,8"

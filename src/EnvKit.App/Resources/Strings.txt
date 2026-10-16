@@ -73,7 +73,11 @@ Enum_LanguageChoice_Turkish	Türkçe	Türkçe
 
 # Main window, review overlay, status messages
 Main_Navigation	Navigation	Gezinme
-Main_UpdateLabel	Restart to update to {0}	{0} için yeniden başlat
+Main_UpdateReady	Update ready: {0}	Güncelleme hazır: {0}
+Main_RestartToUpdate	Restart to update	Yeniden başlat ve güncelle
+Main_Restarting	Restarting…	Yeniden başlatılıyor…
+Status_Updated	Updated	Güncellendi
+Status_UpdatedMessage	EnvKit is now version {0}.	EnvKit {0} sürümüne güncellendi.
 Review_Title	Review changes	Değişiklikleri incele
 Review_Elevation	Includes machine-scope changes: Windows will ask for administrator approval.	Sistem kapsamında değişiklik içeriyor: Windows yönetici onayı isteyecek.
 Review_Irreversible	Some deletions cannot be undone: Windows never reveals the secret of domain credentials.	Bazı silmeler geri alınamaz: Windows etki alanı kimlik bilgilerinin gizli bilgisini hiçbir zaman vermez.

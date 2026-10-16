@@ -84,10 +84,24 @@ public sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Set once a newer release has been downloaded and is ready to install.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(UpdateLabel))]
+    [NotifyPropertyChangedFor(nameof(UpdateLabel), nameof(UpdateAction))]
     public partial string? PendingUpdate { get; set; }
 
-    public string UpdateLabel => Loc.Format("Main_UpdateLabel", PendingUpdate);
+    /// <summary>The app is about to exit for the update; the button says so instead of seeming dead.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UpdateAction))]
+    [NotifyCanExecuteChangedFor(nameof(RestartToUpdateCommand))]
+    public partial bool IsRestarting { get; set; }
+
+    /// <summary>First line of the update button: which version is ready.</summary>
+    public string UpdateLabel => Loc.Format("Main_UpdateReady", PendingUpdate);
+
+    /// <summary>Second line: what clicking does, or that it is happening.</summary>
+    public string UpdateAction => Loc.Get(IsRestarting ? "Main_Restarting" : "Main_RestartToUpdate");
+
+    /// <summary>Called on the first start after an update.</summary>
+    public void AnnounceUpdate(string version) =>
+        ShowStatus(InfoBarSeverity.Success, Loc.Get("Status_Updated"), Loc.Format("Status_UpdatedMessage", version));
 
     /// <summary>Best effort: offline or rate-limited simply means no update this time.</summary>
     public async Task CheckForUpdatesAsync()
@@ -108,8 +122,22 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void RestartToUpdate() => _services.Updater?.ApplyAndRestart();
+    private bool CanRestartToUpdate() => !IsRestarting;
+
+    [RelayCommand(CanExecute = nameof(CanRestartToUpdate))]
+    private async Task RestartToUpdateAsync()
+    {
+        if (_services.Updater is not { } updater)
+        {
+            return;
+        }
+
+        IsRestarting = true;
+
+        // Let the button show "Restarting…" before the process exits for the updater.
+        await Task.Delay(400);
+        updater.ApplyAndRestart();
+    }
 
     /// <param name="beforeApply">Runs once the user confirms, right before the plan is applied.</param>
     public void RequestReview(ChangePlan plan, Action? beforeApply = null)
@@ -200,5 +228,6 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(UpdateLabel));
+        OnPropertyChanged(nameof(UpdateAction));
     }
 }
