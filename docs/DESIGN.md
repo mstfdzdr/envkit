@@ -92,6 +92,21 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
 - **Teknik not:** `CRED_ENUMERATE_ALL_CREDENTIALS` hedef adlarını `LegacyGeneric:target=…` biçiminde döndürür ve bu adlar `CredRead`/`CredDelete` ile kullanılamaz; bu yüzden filtresiz listeleme bayraksız yapılır.
 - **Ertelenen:** "Göster" için Windows Hello onayı (WPF'te `IUserConsentVerifierInterop` gerektiriyor). Şimdilik secret yalnızca açık bir tıklamayla gösterilir ve seçim değişince gizlenir.
 
+## Profiller ve kasa (v0.3) — uygulanan kararlar
+
+- **Profil:** `Profile { Name, Description, Actions[] }`; eylemler `set`, `unset`, `prependPath`, `appendPath`, `removePath`. `%LOCALAPPDATA%\EnvKit.Data\profiles\<ad>.json` altında, elle yazılabilir JSON (eylem türü nesnenin herhangi bir yerinde olabilir). Secret içermez; paylaşılabilir.
+  ```json
+  { "name": "java21", "actions": [
+      { "action": "set", "name": "JAVA_HOME", "value": "C:\\jdk-21" },
+      { "action": "prependPath", "directory": "%JAVA_HOME%\\bin" } ] }
+  ```
+- **Kalıcı uygulama** (`profile apply`): yalnızca **User** kapsamına, sıradan bir plan olarak (diff, onay, snapshot, geri alma). `%VAR%` referansları korunur (REG_EXPAND_SZ), bu yüzden `%JAVA_HOME%\bin` kalıbıyla JDK geçişi yalnızca `JAVA_HOME`'u değiştirir. `prependPath` mevcut girdiyi başa taşır.
+- **Kasa:** `vault.dat`, tek DPAPI şifreli dosya. Çözülemeyen bir kasa (başka kullanıcı, kopyalanmış profil) boş sayılmaz, hata verir; aksi halde sonraki `set` tüm secret'ların üzerine yazardı. Düz metin tamponları sıfırlanır.
+- **Referans:** Profil değerlerinde `${vault:NAME}`. Kasa referanslı profiller kalıcı olarak **uygulanamaz**; yalnızca `envkit run` ile kullanılabilir.
+- **`envkit run -p <profil>... -s NAME[=SECRET]... -- <komut>`:** Mevcut process ortamından başlar, profilleri sırayla uygular; her değer önce o ana kadar kurulan ortama göre expand edilir, sonra kasa referansları doldurulur (secret içindeki `%` asla expand edilmez). Komut yeni PATH'te aranır; alt process'in çıkış kodu aynen döner; Ctrl+C alt process'e bırakılır. Kalıcı ortama hiçbir şey yazılmaz.
+- **Kasa ve plan:** Kasa işlemleri plan/snapshot yolundan geçmez (secret'ları snapshot'a kopyalamamak için). Bu yüzden kasa silme geri alınamaz; CLI onay ister, GUI iki tıklama ister.
+- **Stdin:** Windows PowerShell pipe ile gönderdiği metnin başına UTF-8 BOM koyar ve `Console.In` bunu ayıklamaz. `--value-stdin` / `--password-stdin` okumaları bu karakteri temizler (aksi halde secret'ın parçası oluyordu).
+
 ## `.env` ve user-secrets düzenleme (v0.4)
 
 Düzenleme, dosyanın geri kalanına dokunmadan yapılmalı:
@@ -128,8 +143,9 @@ envkit path fix --dedupe --remove-missing
 envkit which <exe>
 envkit var get|set|unset <name> [--scope ...]
 envkit snapshot list | diff <id> | restore <id>
-envkit profile apply <name>               (v0.3)
-envkit run --profile <name> -- <cmd>      (v0.3)
+envkit profile new|list|show|apply|delete|import|export   (v0.3)
+envkit vault list|set|get|delete                          (v0.3)
+envkit run -p <profile> -s NAME[=SECRET] -- <cmd>         (v0.3)
 envkit cred list [--filter git:*]         (v0.2)
 envkit dotenv get|set|unset <key> [--file .env]   (v0.4)
 ```
