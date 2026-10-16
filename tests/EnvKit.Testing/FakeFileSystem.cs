@@ -1,8 +1,8 @@
 using EnvKit.Core.IO;
 
-namespace EnvKit.Core.Tests.Fakes;
+namespace EnvKit.Testing;
 
-internal sealed class FakeFileSystem : IFileSystem
+public sealed class FakeFileSystem : IFileSystem
 {
     private readonly HashSet<string> _directories = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _files = new(StringComparer.OrdinalIgnoreCase);

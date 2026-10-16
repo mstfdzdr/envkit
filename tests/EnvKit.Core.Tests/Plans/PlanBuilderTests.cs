@@ -1,6 +1,6 @@
 using EnvKit.Core.Plans;
 using EnvKit.Core.Snapshots;
-using EnvKit.Core.Tests.Fakes;
+using EnvKit.Testing;
 using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Tests.Plans;

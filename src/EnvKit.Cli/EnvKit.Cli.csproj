@@ -4,11 +4,20 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>$(WindowsTfm)</TargetFramework>
     <AssemblyName>envkit</AssemblyName>
+    <RootNamespace>EnvKit.Cli</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EnvKit.Core\EnvKit.Core.csproj" />
     <ProjectReference Include="..\EnvKit.Windows\EnvKit.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EnvKit.Cli.Tests" />
   </ItemGroup>
 
 </Project>

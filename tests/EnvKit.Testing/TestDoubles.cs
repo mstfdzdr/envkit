@@ -1,18 +1,19 @@
+using EnvKit.Core;
 using EnvKit.Core.Security;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
 
-namespace EnvKit.Core.Tests.Fakes;
+namespace EnvKit.Testing;
 
 /// <summary>Each reading is one second after the previous one.</summary>
-internal sealed class SteppingTimeProvider : TimeProvider
+public sealed class SteppingTimeProvider : TimeProvider
 {
     private DateTimeOffset _now = new(2026, 10, 16, 12, 0, 0, TimeSpan.Zero);
 
     public override DateTimeOffset GetUtcNow() => _now = _now.AddSeconds(1);
 }
 
-internal sealed class CountingBroadcaster : IEnvChangeBroadcaster
+public sealed class CountingBroadcaster : IEnvChangeBroadcaster
 {
     public int Count { get; private set; }
 
@@ -23,7 +24,7 @@ internal sealed class CountingBroadcaster : IEnvChangeBroadcaster
     }
 }
 
-internal sealed class InMemorySnapshotStore : ISnapshotStore
+public sealed class InMemorySnapshotStore : ISnapshotStore
 {
     public List<Snapshot> Saved { get; } = [];
 
@@ -35,7 +36,7 @@ internal sealed class InMemorySnapshotStore : ISnapshotStore
 }
 
 /// <summary>Reversible but visibly not plain text.</summary>
-internal sealed class XorProtector : ISecretProtector
+public sealed class XorProtector : ISecretProtector
 {
     public int Calls { get; private set; }
 
@@ -53,7 +54,7 @@ internal sealed class XorProtector : ISecretProtector
 }
 
 /// <summary>Behaves like a non-elevated process: machine writes are refused.</summary>
-internal sealed class MachineReadOnlyStore(IEnvStore inner) : IEnvStore
+public sealed class MachineReadOnlyStore(IEnvStore inner) : IEnvStore
 {
     public IReadOnlyList<EnvVariable> GetAll(EnvScope scope) => inner.GetAll(scope);
 

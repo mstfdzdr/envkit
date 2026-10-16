@@ -1,4 +1,4 @@
-using EnvKit.Core.Tests.Fakes;
+using EnvKit.Testing;
 using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Tests.Variables;

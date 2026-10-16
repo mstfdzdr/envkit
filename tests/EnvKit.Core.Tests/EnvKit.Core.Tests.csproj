@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\EnvKit.Core\EnvKit.Core.csproj" />
+    <ProjectReference Include="..\EnvKit.Testing\EnvKit.Testing.csproj" />
   </ItemGroup>
 
 </Project>

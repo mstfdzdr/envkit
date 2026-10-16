@@ -1,8 +1,8 @@
 using EnvKit.Core.Variables;
 
-namespace EnvKit.Core.Tests.Fakes;
+namespace EnvKit.Testing;
 
-internal sealed class InMemoryEnvStore : IEnvStore
+public sealed class InMemoryEnvStore : IEnvStore
 {
     private readonly Dictionary<EnvScope, Dictionary<string, EnvVariable>> _scopes = new()
     {
