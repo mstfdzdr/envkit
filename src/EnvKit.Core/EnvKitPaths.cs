@@ -12,4 +12,8 @@ public static class EnvKitPaths
     public static string Snapshots { get; } = Path.Combine(DataDirectory, "snapshots");
 
     public static string Plans { get; } = Path.Combine(DataDirectory, "plans");
+
+    public static string Profiles { get; } = Path.Combine(DataDirectory, "profiles");
+
+    public static string Vault { get; } = Path.Combine(DataDirectory, "vault.dat");
 }
