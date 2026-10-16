@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
 PackageIdentifier: mstfdzdr.EnvKit
-PackageVersion: 0.4.0
+PackageVersion: 0.5.0
 PackageLocale: en-US
 Publisher: EnvKit contributors
 PublisherUrl: https://github.com/mstfdzdr/envkit
@@ -8,7 +8,7 @@ PackageName: EnvKit
 PackageUrl: https://github.com/mstfdzdr/envkit
 License: MIT
 LicenseUrl: https://github.com/mstfdzdr/envkit/blob/main/LICENSE
-ReleaseNotesUrl: https://github.com/mstfdzdr/envkit/releases/tag/v0.4.0
+ReleaseNotesUrl: https://github.com/mstfdzdr/envkit/releases/tag/v0.5.0
 ShortDescription: Manage Windows environment variables and PATH safely, with previews and undo.
 Description: |-
   EnvKit is a desktop app and CLI (envkit) for Windows environment variables. It finds dead,
