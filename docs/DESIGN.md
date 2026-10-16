@@ -79,6 +79,19 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
 8. **Secret maskeleme:** Adı veya değeri credential'a benzeyen değişkenler (`*_TOKEN`, `*_API_KEY`, `*_PAT`, `ghp_…` vb.) GUI'de ve `envkit var list`'te maskelenir; açıkça "göster" denmeden görünmez, aranmaz, düzenlenemez.
 9. **Paketleme:** Velopack ile per-user kurulum. `current\` altında masaüstü uygulaması, `current\bin\envkit.exe` tek dosyalık CLI. Kurulum hook'u yalnızca `bin` klasörünü User PATH'e ekler (runtime DLL'leri PATH'e girmez), kaldırma hook'u çıkarır; ikisi de snapshot'lı bir plandır.
 
+## Credential Manager (v0.2) — uygulanan kararlar
+
+- **Model:** Kimlik `CredentialKey { TargetName, Kind }` (Windows bir kaydı hedef adı + tür ile tanır; hedef adı büyük/küçük harfe duyarsız). `CredentialState` kullanıcı adı, secret byte'ları, persistence, yorum, alias ve attribute'ları taşır; `ToString` secret'ı asla yazmaz.
+- **Plan entegrasyonu:** `CredentialChange { Key, Before, After }` değişkenlerle aynı `PlanChange` tabanından türer; çakışma kontrolü, hata durumunda geri alma ve inceleme ekranı ortaktır. Credential Manager kullanıcıya özel olduğu için hiçbir zaman elevated helper'a gitmez.
+- **Snapshot'ta secret:** Bir plan credential değiştirdiğinde, snapshot **yalnızca o planın dokunduğu** credential'ların önceki durumunu (secret dahil) saklar; bütün kasa kopyalanmaz. Snapshot zaten DPAPI ile şifreli. Böylece toplu silme ve düzenleme geri alınabilir.
+- **Domain credential'lar:** Windows bunların secret'ını (domain parolası, RDP vb.) hiçbir uygulamaya vermez. Listelenir ve silinebilir ama düzenlenemez; silme işlemi geri alınamaz ve inceleme ekranı bunu açıkça uyarır. Restore bunları atlar.
+- **Kodlama:** Secret bir kodlama işareti taşımaz. Araçların çoğu UTF-16, bazıları (git, Docker) UTF-8 yazar. Kodlama sezgisel olarak tespit edilir ve düzenleme sırasında korunur, böylece sahibi olan araç kaydı okumaya devam eder.
+- **Gruplama:** Hedef adı kalıplarına göre: `git:` → Git, `GitHub - <url>` → GitHub Desktop, `vscode…` → VS Code, `TERMSRV/` → Remote Desktop, domain türleri → Network vb. Eşleşmeyenler "Other".
+- **Parola girişi:** CLI'da parola asla argüman olarak alınmaz (shell geçmişine düşer); etkileşimli terminalde yankısız sorulur ya da `--password-stdin` ile okunur. Boş giriş mevcut parolayı korur.
+- **Export:** Yalnızca envanter (hedef, tür, grup, kullanıcı, persistence, yorum, tarih); secret alanı yoktur.
+- **Teknik not:** `CRED_ENUMERATE_ALL_CREDENTIALS` hedef adlarını `LegacyGeneric:target=…` biçiminde döndürür ve bu adlar `CredRead`/`CredDelete` ile kullanılamaz; bu yüzden filtresiz listeleme bayraksız yapılır.
+- **Ertelenen:** "Göster" için Windows Hello onayı (WPF'te `IUserConsentVerifierInterop` gerektiriyor). Şimdilik secret yalnızca açık bir tıklamayla gösterilir ve seçim değişince gizlenir.
+
 ## `.env` ve user-secrets düzenleme (v0.4)
 
 Düzenleme, dosyanın geri kalanına dokunmadan yapılmalı:

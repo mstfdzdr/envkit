@@ -28,6 +28,11 @@ can silently break `%VARIABLE%` references. EnvKit does those things:
   prompt) only for machine-scope changes.
 - **Secrets stay hidden:** variables that look like tokens or passwords are masked until you ask,
   and snapshots are encrypted with DPAPI.
+- **Credential Manager, usable:** see Windows credentials grouped by the tool that owns them
+  (git, GitHub Desktop, Visual Studio, VS Code, Docker, Remote Desktop, …), search them, edit
+  them, delete many at once, and export an inventory without any secrets. Deletes and edits are
+  snapshotted too, so a bulk cleanup can be undone. (Domain credentials are the exception:
+  Windows never reveals their secret, so deleting one is permanent, and EnvKit says so first.)
 
 ## Install
 
@@ -48,6 +53,12 @@ envkit var get <name> [--scope ...] [--expand]
 envkit var set <name> <value> [--scope ...] [--expand | --literal]
 envkit var unset <name> [--scope ...]
 envkit snapshot list | diff <id> | restore <id>
+
+envkit cred list [--filter git:*] [--group Git]      credentials grouped by tool; secrets never shown
+envkit cred show <target> [--reveal]                 details; the secret only with --reveal
+envkit cred set <target> [--user u] [--password-stdin]   prompts for the password (never an argument)
+envkit cred delete <target>... | --filter f | --group g  bulk delete, undoable
+envkit cred export <file.json>                       inventory without secrets
 ```
 
 Writing commands show the diff and ask before applying. Use `--dry-run` to only preview and
@@ -76,19 +87,20 @@ The tests never write to your real environment: registry tests use throwaway key
 
 | Project | Contents |
 |---|---|
-| `EnvKit.Core` | Platform-neutral engine: PATH analysis, expansion, change plans, snapshots |
-| `EnvKit.Windows` | Registry store, `WM_SETTINGCHANGE`, DPAPI, UAC helper |
+| `EnvKit.Core` | Platform-neutral engine: PATH analysis, expansion, credential model, change plans, snapshots |
+| `EnvKit.Windows` | Registry and Credential Manager stores, `WM_SETTINGCHANGE`, DPAPI, UAC helper |
 | `EnvKit.Cli` | `envkit` |
 | `EnvKit.App` | WPF desktop app |
 
-Design notes and the roadmap live in [docs/DESIGN.md](docs/DESIGN.md). Next up: Windows
-Credential Manager (v0.2), profiles and a secret vault (v0.3), and `.env` / user-secrets
-editing (v0.4).
+Design notes and the roadmap live in [docs/DESIGN.md](docs/DESIGN.md). Next up: profiles and
+a secret vault (v0.3), and `.env` / user-secrets editing (v0.4).
 
 ## Data
 
 Snapshots are stored encrypted in `%LOCALAPPDATA%\EnvKit.Data`, separate from the install
-folder, so they survive an uninstall. Delete that folder to remove them.
+folder, so they survive an uninstall. Delete that folder to remove them. A snapshot holds all
+environment variables and, for credential changes, the previous state (including the secret)
+of only the credentials that change touched; the 100 most recent snapshots are kept.
 
 ## License
 
