@@ -39,6 +39,11 @@ can silently break `%VARIABLE%` references. EnvKit does those things:
 - **A vault for secrets:** API keys and tokens live in a DPAPI-encrypted vault instead of your
   environment. Profiles reference them as `${vault:NAME}`, and `envkit run` injects them into the
   one process that needs them; they are never written to the persistent environment.
+- **.env files and .NET user secrets:** find them across a folder tree, see which `.env` files
+  are committed to git or missing from `.gitignore`, and edit keys without disturbing the rest of
+  the file: comments, quoting, `export`, line endings and byte order marks stay exactly as they
+  were. Move a secret out of a `.env` into the vault, leaving `${vault:NAME}` behind, and
+  `envkit run --env-file .env` fills it back in for the process.
 
 ## Install
 
@@ -69,7 +74,13 @@ envkit cred export <file.json>                       inventory without secrets
 envkit profile new <name> [--set N=V] [--unset N] [--remove-path D] [--prepend-path D] [--append-path D]
 envkit profile list | show <name> | apply <name> | delete <name> | import <file> | export <name> <file>
 envkit vault list | set <name> [--value-stdin] | get <name> | delete <name>
-envkit run [-p profile]... [-s NAME[=SECRET]]... -- <command> [args]
+envkit run [-p profile]... [-e .env]... [-s NAME[=SECRET]]... -- <command> [args]
+
+envkit dotenv scan [folder]                          .env files and user-secrets projects, with git warnings
+envkit dotenv list | get <key> [-f .env]             values that look secret are masked
+envkit dotenv set <key> [value] | unset <key> | rename <key> <new>
+envkit dotenv link <key> <vault-name> [--move]       replace the value with ${vault:name}
+envkit user-secrets list | set <key> [value] | unset <key> [-p project]
 ```
 
 For example, keep a token out of your environment and still give it to one tool:
@@ -88,6 +99,16 @@ envkit run -p java21 -- mvn package
 
 Profiles are plain JSON files (`envkit profile export`), so they can be shared or kept in a
 repository; they hold `${vault:...}` references, never secrets.
+
+Or get a live key out of a project's `.env` without breaking the app:
+
+```powershell
+envkit dotenv link STRIPE_SECRET stripe --move     # value goes to the vault, the file keeps ${vault:stripe}
+envkit run -e .env -- npm start                    # the process still sees the real value
+```
+
+Like every other change, `.env` and user-secrets edits are previewed, refused if the file
+changed in the meantime, written atomically, and can be undone from History.
 
 Writing commands show the diff and ask before applying. Use `--dry-run` to only preview and
 `--yes` to skip the question (required when input is redirected, e.g. in scripts). Scope
@@ -120,15 +141,14 @@ The tests never write to your real environment: registry tests use throwaway key
 | `EnvKit.Cli` | `envkit` |
 | `EnvKit.App` | WPF desktop app |
 
-Design notes and the roadmap live in [docs/DESIGN.md](docs/DESIGN.md). Next up: `.env` and
-user-secrets editing (v0.4).
+Design notes and decisions live in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Data
 
 Snapshots are stored encrypted in `%LOCALAPPDATA%\EnvKit.Data`, separate from the install
 folder, so they survive an uninstall. Delete that folder to remove them. A snapshot holds all
 environment variables and, for credential changes, the previous state (including the secret)
-of only the credentials that change touched; the 100 most recent snapshots are kept. Profiles
+of only the credentials and files that change touched; the 100 most recent snapshots are kept. Profiles
 are JSON files in `profiles\` and the vault is `vault.dat` (DPAPI-encrypted) in the same folder.
 Vault secrets are not snapshotted, so deleting one cannot be undone.
 

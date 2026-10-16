@@ -107,17 +107,20 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
 - **Kasa ve plan:** Kasa işlemleri plan/snapshot yolundan geçmez (secret'ları snapshot'a kopyalamamak için). Bu yüzden kasa silme geri alınamaz; CLI onay ister, GUI iki tıklama ister.
 - **Stdin:** Windows PowerShell pipe ile gönderdiği metnin başına UTF-8 BOM koyar ve `Console.In` bunu ayıklamaz. `--value-stdin` / `--password-stdin` okumaları bu karakteri temizler (aksi halde secret'ın parçası oluyordu).
 
-## `.env` ve user-secrets düzenleme (v0.4)
+## `.env` ve user-secrets düzenleme (v0.4) — uygulanan kararlar
 
-Düzenleme, dosyanın geri kalanına dokunmadan yapılmalı:
-
-- **Round-trip parser:** dosya satır token'larına ayrılır (yorum, boş satır, `KEY=value`, `export KEY=value`). Tırnak stili (`"`, `'`, yok), satır içi yorumlar, sıra, encoding (BOM dahil) ve satır sonları (CRLF/LF) korunur. Değiştirilmeyen satırlar byte-byte aynı kalır.
-- **Operasyonlar:** `DotEnvSet`, `DotEnvDelete`, `DotEnvRename` — diğer her şey gibi ChangePlan üzerinden.
-- **Çakışma tespiti:** plan oluşturulurken dosya hash'i alınır; uygulama anında dosya değişmişse işlem durur ve kullanıcıya diff gösterilir.
-- **Atomik yazma:** temp dosyaya yaz → `File.Replace`. Yazmadan önce dosya snapshot'ı alınır.
-- **user-secrets:** `%APPDATA%\Microsoft\UserSecrets\<id>\secrets.json`, `System.Text.Json` node API'siyle düzenlenir; `UserSecretsId` csproj'dan bulunur.
-- **Uyarılar:** `.env` dosyası `.gitignore` kapsamında değilse veya git'e commit edilmişse uyarı gösterilir.
-- **Kasa referansı:** `.env` içindeki değer kasadaki bir anahtara bağlanabilir; `envkit run` sırasında çözülür.
+- **Round-trip parser** (`DotEnvDocument`): her satır parçalarına ayrılır (girinti, `export`, anahtar, `=` çevresindeki boşluk, ham değer, satır içi yorum, satır sonu). Düzenleme yalnızca anahtar ya da değer parçasını değiştirir; diğer her byte okunduğu gibi yazılır. Desteklenen: yorumlar, boş satırlar, tek/çift/tırnaksız değerler, çok satırlı çift tırnaklı değerler, CRLF/LF, UTF-8/UTF-16 BOM. Son satır sonu yoksa yeni anahtar da yok olarak eklenir.
+- **Anlam:** Anahtarlar büyük/küçük harfe duyarlı; aynı anahtar birden çok kez atanırsa son atama kazanır (dotenv yükleyicileri gibi). Tekrarlar ve geçersiz satırlar satır numarasıyla raporlanır. Önünde boşluk olan `#` yorum başlatır (`URL=https://x/#a` yorum değildir).
+- **Tırnak:** `Set` mevcut tırnak stilini, değeri temsil edebiliyorsa korur; edemiyorsa en basit güvenli biçimi seçer.
+- **Geçersiz UTF-8:** böyle dosyalar salt okunur; yeniden yazmak bozuk byte'ları sessizce değiştirirdi.
+- **Plan:** Ayrı `DotEnvSet/Delete/Rename` operasyonları yerine `FileChange { Path, Format, Before, After }` (dosyanın tüm byte'ları). Önceki byte'lar ön koşuldur: önizlemeden sonra başka bir editör dosyayı değiştirdiyse plan durur. `PlanBuilder.EditDotEnv/EditUserSecrets` aynı dosyadaki düzenlemeleri üst üste biriktirir.
+- **Yazma:** aynı klasörde geçici dosya + `File.Replace` (atomik). Snapshot dosyanın önceki içeriğini tutar; restore byte byte geri yazar ya da planın oluşturduğu dosyayı siler.
+- **İnceleme:** anahtar bazında diff; secret'a benzeyen değerler hiç gösterilmez (`KEY: changed`).
+- **user-secrets** (`UserSecretsDocument`): `%APPDATA%\Microsoft\UserSecrets\<id>\secrets.json`; düz (`A:B`) ve iç içe anahtarlar yapılandırma anahtarı olarak okunur, düzenleme anahtarın mevcut biçimini korur, yeni anahtarlar `dotnet user-secrets` gibi düz eklenir. Yorumlar korunmaz (dosya JSON olarak yeniden yazılır).
+- **Güvenlik:** `UserSecretsId` csproj'dan geldiği için güvenilmezdir; klasör dışına çıkabilecek id'ler (`..`, ayraçlar, geçersiz karakterler) reddedilir.
+- **Tarama:** `.env` ve `.env.*` dosyaları ile `UserSecretsId` içeren `.csproj`'lar; `node_modules`, `bin`, `obj`, `.git` vb. ve reparse point'ler atlanır. `.env.example` benzeri şablonlar uyarı almaz. Git durumu `git check-ignore` ve `git ls-files` ile git'in kendisine sorulur (commit edilmiş / ignore edilmemiş).
+- **Kasa:** `envkit dotenv link KEY NAME --move` değeri kasaya taşır, dosyada `${vault:NAME}` bırakır; kasa yazması onaydan sonra, dosya değişmeden hemen önce yapılır. `envkit run --env-file` değerleri yükler ve referansları çözer (sıra: ortam → profiller → env dosyaları → `--secret`).
+- **Maskeleme:** kullanıcı adı/parola içeren URL'ler (`postgres://u:p@host`) ve `*_DSN` anahtarları da secret sayılır. Grid satırlarının UI Automation adı satır nesnesinin `ToString()`'inden gelir; satırlar ve `EnvVariable` bu yüzden yalnızca adı yazdırır (record varsayılanı değeri de yazıyordu).
 
 ## Veri modeli (özet)
 
@@ -147,7 +150,9 @@ envkit profile new|list|show|apply|delete|import|export   (v0.3)
 envkit vault list|set|get|delete                          (v0.3)
 envkit run -p <profile> -s NAME[=SECRET] -- <cmd>         (v0.3)
 envkit cred list [--filter git:*]         (v0.2)
-envkit dotenv get|set|unset <key> [--file .env]   (v0.4)
+envkit dotenv scan|list|get|set|unset|rename|link [--file .env]   (v0.4)
+envkit user-secrets list|set|unset [--project]                    (v0.4)
+envkit run --env-file .env -- <cmd>                               (v0.4)
 ```
 
 ## Ekranlar
