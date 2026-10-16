@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
+using EnvKit.Core.Credentials;
+using EnvKit.Core.Plans;
 using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Snapshots;
@@ -8,11 +10,36 @@ public sealed record SnapshotInfo(string Id, DateTimeOffset CreatedAt, string Re
 
 public sealed record SnapshotVariable(EnvScope Scope, string Name, string Value, EnvValueKind Kind);
 
-/// <summary>Every persistent variable in both scopes at one point in time.</summary>
-public sealed record Snapshot(SnapshotInfo Info, IReadOnlyList<SnapshotVariable> Variables)
+/// <param name="State"><see langword="null"/>: the credential did not exist.</param>
+public sealed record SnapshotCredential(CredentialKey Key, CredentialState? State);
+
+/// <summary>
+/// Every persistent variable in both scopes at one point in time, plus the prior state of the
+/// credentials the plan touched. Credentials are not copied wholesale: the snapshot should hold
+/// no more secrets than the change needs to be undone.
+/// </summary>
+/// <param name="Credentials"><see langword="null"/> in snapshots written before credentials existed.</param>
+public sealed record Snapshot(SnapshotInfo Info, IReadOnlyList<SnapshotVariable> Variables, IReadOnlyList<SnapshotCredential>? Credentials = null)
 {
     [JsonIgnore]
     public string Id => Info.Id;
+
+    [JsonIgnore]
+    public IReadOnlyList<SnapshotCredential> CredentialList => Credentials ?? [];
+
+    /// <summary>The state before <paramref name="plan"/>: all variables and the credentials it changes.</summary>
+    public static Snapshot BeforePlan(IEnvStore store, ChangePlan plan, TimeProvider? timeProvider = null)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+        var credentials = plan.Changes
+            .OfType<CredentialChange>()
+            .Select(c => new SnapshotCredential(c.Key, c.Before))
+            .ToList();
+        return Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider) with
+        {
+            Credentials = credentials.Count == 0 ? null : credentials,
+        };
+    }
 
     public static Snapshot Capture(IEnvStore store, string reason, Guid? planId = null, TimeProvider? timeProvider = null)
     {

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace EnvKit.Core.Credentials;
 
@@ -64,9 +65,12 @@ public sealed record CredentialState(
     /// <summary>The longest secret CredWrite accepts (CRED_MAX_CREDENTIAL_BLOB_SIZE).</summary>
     public const int MaxSecretBytes = 5 * 512;
 
+    [JsonIgnore]
     public IReadOnlyList<CredentialAttributeEntry> AttributeList => Attributes ?? [];
 
     /// <summary>Most tools store a UTF-16 password; some (git, Docker) store UTF-8.</summary>
+    /// <remarks>Ignored by serialization: snapshots keep only the raw bytes.</remarks>
+    [JsonIgnore]
     public string? SecretText => Secret is null ? null : DetectEncoding(Secret).GetString(Secret);
 
     /// <summary>Encodes <paramref name="text"/> the way <paramref name="previous"/> was, so editing keeps the owning tool's format.</summary>

@@ -1,3 +1,4 @@
+using EnvKit.Core.Credentials;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
@@ -8,9 +9,36 @@ namespace EnvKit.Core.Plans;
 /// Collects edits against the current store state. Repeated edits to one variable collapse
 /// into a single change, and edits that end where they started disappear.
 /// </summary>
-public sealed class PlanBuilder(IEnvStore store, TimeProvider? timeProvider = null)
+/// <param name="credentials">Required only for credential edits and for restoring snapshots that contain credentials.</param>
+public sealed class PlanBuilder(IEnvStore store, ICredentialStore? credentials = null, TimeProvider? timeProvider = null)
 {
     private readonly List<Pending> _pending = [];
+    private readonly List<PendingCredential> _pendingCredentials = [];
+
+    /// <summary>Creates or replaces a generic credential.</summary>
+    public PlanBuilder SetCredential(CredentialKey key, CredentialState state)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(state);
+        if (key.Kind != CredentialKind.Generic)
+        {
+            throw new NotSupportedException($"Only generic credentials can be written, not {key.Kind}.");
+        }
+
+        if ((state.Secret?.Length ?? 0) > CredentialState.MaxSecretBytes)
+        {
+            throw new ArgumentException($"The secret is {state.Secret!.Length} bytes; the limit is {CredentialState.MaxSecretBytes}.");
+        }
+
+        TrackCredential(key).After = state;
+        return this;
+    }
+
+    public PlanBuilder DeleteCredential(CredentialKey key)
+    {
+        TrackCredential(key).After = null;
+        return this;
+    }
 
     public PlanBuilder Set(string name, EnvScope scope, string value, EnvValueKind? kind = null)
     {
@@ -103,6 +131,24 @@ public sealed class PlanBuilder(IEnvStore store, TimeProvider? timeProvider = nu
             }
         }
 
+        // Credentials are restored only when restoring everything: they are not scoped.
+        if (onlyScope is null && credentials is not null)
+        {
+            foreach (var credential in snapshot.CredentialList)
+            {
+                if (credential.State is null)
+                {
+                    DeleteCredential(credential.Key);
+                }
+                else if (credential.State.Secret is not null)
+                {
+                    SetCredential(credential.Key, credential.State);
+                }
+
+                // A domain credential without a readable secret cannot be recreated; it is skipped.
+            }
+        }
+
         return this;
     }
 
@@ -112,6 +158,9 @@ public sealed class PlanBuilder(IEnvStore store, TimeProvider? timeProvider = nu
         var changes = _pending
             .Where(p => p.Before != p.After)
             .Select(PlanChange (p) => new VariableChange(p.Scope, p.Name, p.Before, p.After))
+            .Concat(_pendingCredentials
+                .Where(p => p.Before != p.After)
+                .Select(PlanChange (p) => new CredentialChange(p.Key, p.Before, p.After)))
             .ToList();
         var now = (timeProvider ?? TimeProvider.System).GetUtcNow();
         return new ChangePlan(Guid.NewGuid(), description, now, changes);
@@ -144,6 +193,33 @@ public sealed class PlanBuilder(IEnvStore store, TimeProvider? timeProvider = nu
 
     private static bool SameDirectory(string a, string b) =>
         string.Equals(PathList.Normalize(a), PathList.Normalize(b), StringComparison.OrdinalIgnoreCase);
+
+    private PendingCredential TrackCredential(CredentialKey key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        var existing = _pendingCredentials.Find(p => p.Key == key);
+        if (existing is not null)
+        {
+            return existing;
+        }
+
+        var credentialStore = credentials ?? throw new InvalidOperationException("No credential store was given.");
+        var stored = credentialStore.Get(key);
+
+        // Keep the stored spelling of the target, as for variable names.
+        var pending = new PendingCredential(stored?.Key ?? key, stored?.State);
+        _pendingCredentials.Add(pending);
+        return pending;
+    }
+
+    private sealed class PendingCredential(CredentialKey key, CredentialState? before)
+    {
+        public CredentialKey Key { get; } = key;
+
+        public CredentialState? Before { get; } = before;
+
+        public CredentialState? After { get; set; } = before;
+    }
 
     private sealed class Pending(string name, EnvScope scope, VariableValue? before)
     {

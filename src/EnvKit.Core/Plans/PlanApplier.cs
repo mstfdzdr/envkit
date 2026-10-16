@@ -1,3 +1,4 @@
+using EnvKit.Core.Credentials;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
 
@@ -9,10 +10,12 @@ public sealed record PlanResult(SnapshotInfo? Snapshot, bool Broadcast);
 
 /// <param name="snapshots"><see langword="null"/> to skip the snapshot (the elevated helper: its caller already took one).</param>
 /// <param name="broadcaster"><see langword="null"/> to leave notifying to the caller.</param>
+/// <param name="credentials">Required only for plans with credential changes.</param>
 public sealed class PlanApplier(
     IEnvStore store,
     ISnapshotStore? snapshots,
     IEnvChangeBroadcaster? broadcaster,
+    ICredentialStore? credentials = null,
     TimeProvider? timeProvider = null)
 {
     /// <summary>
@@ -20,7 +23,7 @@ public sealed class PlanApplier(
     /// broadcasts once. If a write fails, the changes already written are reverted and the
     /// original exception (e.g. <see cref="ElevationRequiredException"/>) propagates.
     /// </summary>
-    /// <exception cref="PlanConflictException">The store no longer matches the plan's before state.</exception>
+    /// <exception cref="PlanConflictException">The stores no longer match the plan's before state.</exception>
     /// <exception cref="PlanApplyException">A write failed and reverting the earlier writes also failed.</exception>
     public PlanResult Apply(ChangePlan plan)
     {
@@ -30,25 +33,24 @@ public sealed class PlanApplier(
             return new PlanResult(null, Broadcast: false);
         }
 
-        var changes = VariableChanges(plan);
-        EnsureCurrent(changes);
+        EnsureCurrent(plan.Changes);
 
         SnapshotInfo? snapshot = null;
         if (snapshots is not null)
         {
-            var captured = Snapshot.Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider);
+            var captured = Snapshot.BeforePlan(store, plan, timeProvider);
             snapshots.Save(captured);
             snapshot = captured.Info;
         }
 
-        WriteAll(changes, snapshot);
-        return new PlanResult(snapshot, broadcaster?.Broadcast() ?? false);
+        WriteAll(plan.Changes, snapshot);
+        return new PlanResult(snapshot, plan.Changes.Any(c => c is VariableChange) && (broadcaster?.Broadcast() ?? false));
     }
 
-    /// <exception cref="PlanConflictException">Some changes no longer match the store.</exception>
-    public void EnsureCurrent(IEnumerable<VariableChange> changes)
+    /// <exception cref="PlanConflictException">Some changes no longer match the stores.</exception>
+    public void EnsureCurrent(IEnumerable<PlanChange> changes)
     {
-        var conflicts = changes.Where(c => Current(c) != c.Before).ToList();
+        var conflicts = changes.Where(c => !IsCurrent(c)).ToList();
         if (conflicts.Count > 0)
         {
             throw new PlanConflictException(conflicts);
@@ -56,15 +58,15 @@ public sealed class PlanApplier(
     }
 
     /// <summary>Writes in order; if one write fails, the earlier ones are reverted before rethrowing.</summary>
-    public void WriteAll(IReadOnlyList<VariableChange> changes, SnapshotInfo? snapshot)
+    public void WriteAll(IReadOnlyList<PlanChange> changes, SnapshotInfo? snapshot)
     {
         ArgumentNullException.ThrowIfNull(changes);
-        var applied = new List<VariableChange>();
+        var applied = new List<PlanChange>();
         try
         {
             foreach (var change in changes)
             {
-                Write(change.Scope, change.Name, change.After);
+                Write(change, forward: true);
                 applied.Add(change);
             }
         }
@@ -82,7 +84,7 @@ public sealed class PlanApplier(
 
     /// <summary>Puts every change's before state back, newest first.</summary>
     /// <exception cref="AggregateException">Some changes could not be reverted.</exception>
-    public void RevertAll(IReadOnlyList<VariableChange> changes)
+    public void RevertAll(IReadOnlyList<PlanChange> changes)
     {
         ArgumentNullException.ThrowIfNull(changes);
         var failures = TryRevert(changes);
@@ -92,35 +94,64 @@ public sealed class PlanApplier(
         }
     }
 
-    public static List<VariableChange> VariableChanges(ChangePlan plan)
+    private bool IsCurrent(PlanChange change) => change switch
     {
-        ArgumentNullException.ThrowIfNull(plan);
-        return [.. plan.Changes.Cast<VariableChange>()];
+        VariableChange v => (store.Get(v.Name, v.Scope) is { } current ? new VariableValue(current.Value, current.Kind) : null) == v.Before,
+        CredentialChange c => Credentials.Get(c.Key)?.State == c.Before,
+        _ => throw new NotSupportedException(change.GetType().Name),
+    };
+
+    private void Write(PlanChange change, bool forward)
+    {
+        switch (change)
+        {
+            case VariableChange v:
+                var value = forward ? v.After : v.Before;
+                if (value is null)
+                {
+                    store.Delete(v.Name, v.Scope);
+                }
+                else
+                {
+                    store.Set(new EnvVariable(v.Name, value.Value, v.Scope, value.Kind));
+                }
+
+                break;
+
+            case CredentialChange c:
+                var state = forward ? c.After : c.Before;
+                if (state is null)
+                {
+                    Credentials.Delete(c.Key);
+                }
+                else if (state.Secret is not null)
+                {
+                    Credentials.Write(c.Key, state);
+                }
+                else
+                {
+                    // Only reachable when reverting the deletion of a domain credential.
+                    throw new NotSupportedException($"{c.Key} cannot be recreated: Windows never revealed its secret.");
+                }
+
+                break;
+
+            default:
+                throw new NotSupportedException(change.GetType().Name);
+        }
     }
 
-    private VariableValue? Current(VariableChange change) =>
-        store.Get(change.Name, change.Scope) is { } v ? new VariableValue(v.Value, v.Kind) : null;
+    private ICredentialStore Credentials =>
+        credentials ?? throw new InvalidOperationException("This plan changes credentials, but no credential store was given.");
 
-    private void Write(EnvScope scope, string name, VariableValue? value)
-    {
-        if (value is null)
-        {
-            store.Delete(name, scope);
-        }
-        else
-        {
-            store.Set(new EnvVariable(name, value.Value, scope, value.Kind));
-        }
-    }
-
-    private List<Exception> TryRevert(IReadOnlyList<VariableChange> applied)
+    private List<Exception> TryRevert(IReadOnlyList<PlanChange> applied)
     {
         var failures = new List<Exception>();
         for (var i = applied.Count - 1; i >= 0; i--)
         {
             try
             {
-                Write(applied[i].Scope, applied[i].Name, applied[i].Before);
+                Write(applied[i], forward: false);
             }
 #pragma warning disable CA1031 // Keep reverting the rest; every failure is reported to the caller.
             catch (Exception ex)
@@ -136,8 +167,8 @@ public sealed class PlanApplier(
 
 public sealed class PlanConflictException : Exception
 {
-    public PlanConflictException(IReadOnlyList<VariableChange> conflicts)
-        : base($"Changed since the plan was made: {string.Join(", ", conflicts.Select(c => $@"{c.Scope}\{c.Name}"))}.") =>
+    public PlanConflictException(IReadOnlyList<PlanChange> conflicts)
+        : base($"Changed since the plan was made: {string.Join(", ", conflicts.Select(c => c.Subject))}.") =>
         Conflicts = conflicts;
 
     public PlanConflictException()
@@ -151,7 +182,7 @@ public sealed class PlanConflictException : Exception
     public PlanConflictException(string message, Exception innerException)
         : base(message, innerException) => Conflicts = [];
 
-    public IReadOnlyList<VariableChange> Conflicts { get; }
+    public IReadOnlyList<PlanChange> Conflicts { get; }
 }
 
 /// <summary>The plan is partially applied; <see cref="Snapshot"/>, when present, restores the state before it.</summary>

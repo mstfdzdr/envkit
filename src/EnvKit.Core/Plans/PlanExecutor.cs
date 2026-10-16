@@ -1,3 +1,4 @@
+using EnvKit.Core.Credentials;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
 
@@ -17,14 +18,16 @@ public interface IElevation
 
 /// <summary>
 /// Applies a plan, elevating only for its machine-scope part when this process cannot.
-/// User changes are written here rather than by the helper: if the prompt is answered with
-/// another administrator's credentials, the helper's HKCU belongs to that administrator.
+/// Everything else (user variables, credentials) is written here rather than by the helper:
+/// if the prompt is answered with another administrator's credentials, the helper's HKCU and
+/// Credential Manager belong to that administrator.
 /// </summary>
 public sealed class PlanExecutor(
     IEnvStore store,
     ISnapshotStore snapshots,
     IEnvChangeBroadcaster broadcaster,
     IElevation elevation,
+    ICredentialStore? credentials = null,
     TimeProvider? timeProvider = null)
 {
     public PlanResult Execute(ChangePlan plan)
@@ -32,23 +35,22 @@ public sealed class PlanExecutor(
         ArgumentNullException.ThrowIfNull(plan);
         if (plan.IsEmpty || !plan.RequiresElevation || elevation.IsElevated)
         {
-            return new PlanApplier(store, snapshots, broadcaster, timeProvider).Apply(plan);
+            return new PlanApplier(store, snapshots, broadcaster, credentials, timeProvider).Apply(plan);
         }
 
-        var local = new PlanApplier(store, snapshots: null, broadcaster: null, timeProvider);
-        var changes = PlanApplier.VariableChanges(plan);
+        var local = new PlanApplier(store, snapshots: null, broadcaster: null, credentials, timeProvider);
 
         // Fail before showing a UAC prompt for a plan that cannot apply anyway.
-        local.EnsureCurrent(changes);
+        local.EnsureCurrent(plan.Changes);
 
         // Taken here, not by the helper, so it is protected with this user's DPAPI key.
-        var snapshot = Snapshot.Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider);
+        var snapshot = Snapshot.BeforePlan(store, plan, timeProvider);
         snapshots.Save(snapshot);
 
-        // User changes first: they can be reverted without elevation if the prompt is declined.
-        var userChanges = changes.Where(c => !c.RequiresElevation).ToList();
-        var machinePlan = plan with { Changes = [.. changes.Where(c => c.RequiresElevation)] };
-        local.WriteAll(userChanges, snapshot.Info);
+        // Local changes first: they can be reverted without elevation if the prompt is declined.
+        var localChanges = plan.Changes.Where(c => !c.RequiresElevation).ToList();
+        var machinePlan = plan with { Changes = [.. plan.Changes.Where(c => c.RequiresElevation)] };
+        local.WriteAll(localChanges, snapshot.Info);
 
         try
         {
@@ -58,7 +60,7 @@ public sealed class PlanExecutor(
         {
             try
             {
-                local.RevertAll(userChanges);
+                local.RevertAll(localChanges);
             }
             catch (AggregateException revertFailure)
             {

@@ -53,7 +53,7 @@ public class PlanApplierTests
         _store.Set(new EnvVariable("Path", @"C:\a;C:\installer", EnvScope.User));
 
         var conflict = Assert.Throws<PlanConflictException>(() => Applier().Apply(plan));
-        Assert.Equal("Path", Assert.Single(conflict.Conflicts).Name);
+        Assert.Equal(@"User\Path", Assert.Single(conflict.Conflicts).Subject);
         Assert.Equal(@"C:\a;C:\installer", _store.Get("Path", EnvScope.User)?.Value);
         Assert.Empty(_snapshots.Saved);
     }

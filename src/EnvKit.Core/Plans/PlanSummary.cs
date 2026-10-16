@@ -14,7 +14,58 @@ public static class PlanSummary
     public static IReadOnlyList<ChangeSummary> Summarize(ChangePlan plan)
     {
         ArgumentNullException.ThrowIfNull(plan);
-        return [.. plan.Changes.Cast<VariableChange>().Select(Summarize)];
+        return [.. plan.Changes.Select(change => change switch
+        {
+            VariableChange v => Summarize(v),
+            CredentialChange c => Summarize(c),
+            _ => new ChangeSummary(change.Subject, string.Empty, []),
+        })];
+    }
+
+    /// <summary>Describes what changes about the secret without ever including it.</summary>
+    public static ChangeSummary Summarize(CredentialChange change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        var (before, after) = (change.Before, change.After);
+        var lines = new List<DiffLine>();
+
+        void Field(string label, string? old, string? @new)
+        {
+            if (old == @new)
+            {
+                return;
+            }
+
+            if (old is not null)
+            {
+                lines.Add(new DiffLine(DiffKind.Removed, $"{label}: {old}"));
+            }
+
+            if (@new is not null)
+            {
+                lines.Add(new DiffLine(DiffKind.Added, $"{label}: {@new}"));
+            }
+        }
+
+        Field("user", before?.UserName, after?.UserName);
+        Field("comment", before?.Comment, after?.Comment);
+        Field("persistence", before?.Persistence.ToString(), after?.Persistence.ToString());
+
+        var secretChanged = before?.Secret is null != after?.Secret is null
+            || (before?.Secret is { } b && after?.Secret is { } a && !b.AsSpan().SequenceEqual(a));
+        if (after is not null && secretChanged)
+        {
+            lines.Add(new DiffLine(DiffKind.Added, before is null ? "password: set" : "password: changed"));
+        }
+
+        var note = (before, after) switch
+        {
+            (null, _) => "new",
+            (_, null) when change.IsIrreversible => "delete; Windows never reveals this secret, so it cannot be restored",
+            (_, null) => "delete",
+            _ => string.Empty,
+        };
+        return new ChangeSummary(change.Subject, note, lines);
     }
 
     public static ChangeSummary Summarize(VariableChange change)
