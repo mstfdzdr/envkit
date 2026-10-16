@@ -32,4 +32,5 @@
   <data name="Issue_NotExpanded" xml:space="preserve"><value>genişletilmiyor: PATH REG_SZ</value></data>
   <data name="Issue_NotFullyQualified" xml:space="preserve"><value>göreli yol</value></data>
   <data name="Issue_ValueTooLong" xml:space="preserve"><value>değer çok uzun: {0} &gt; {1} karakter</value></data>
+  <data name="Snapshot_BeforePlan" xml:space="preserve"><value>Önce: {0}</value></data>
 </root>

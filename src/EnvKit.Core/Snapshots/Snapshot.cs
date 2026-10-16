@@ -6,7 +6,30 @@ using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Snapshots;
 
-public sealed record SnapshotInfo(string Id, DateTimeOffset CreatedAt, string Reason, Guid? PlanId);
+/// <param name="Reason">
+/// For snapshots taken before a plan (<paramref name="PlanId"/> set), the plan's description;
+/// the "Before:" wording is added when displayed, in the reader's language.
+/// </param>
+public sealed record SnapshotInfo(string Id, DateTimeOffset CreatedAt, string Reason, Guid? PlanId)
+{
+    /// <summary>Written by versions that stored the English prefix with the reason.</summary>
+    private const string LegacyPrefix = "Before: ";
+
+    /// <summary>The reason as shown in History and <c>envkit snapshot list</c>.</summary>
+    [JsonIgnore]
+    public string DisplayReason => Describe();
+
+    public string Describe(CultureInfo? culture = null)
+    {
+        if (PlanId is null)
+        {
+            return Reason;
+        }
+
+        var description = Reason.StartsWith(LegacyPrefix, StringComparison.Ordinal) ? Reason[LegacyPrefix.Length..] : Reason;
+        return CoreText.FormatIn(culture, "Snapshot_BeforePlan", description);
+    }
+}
 
 public sealed record SnapshotVariable(EnvScope Scope, string Name, string Value, EnvValueKind Kind);
 
@@ -56,7 +79,8 @@ public sealed record Snapshot(
             .OfType<FileChange>()
             .Select(f => new SnapshotFile(f.Path, f.Format, f.Before))
             .ToList();
-        return Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider) with
+        // Only the description is stored: a translated prefix would freeze the language at save time.
+        return Capture(store, plan.Description, plan.Id, timeProvider) with
         {
             Credentials = credentials.Count == 0 ? null : credentials,
             Files = files.Count == 0 ? null : files,

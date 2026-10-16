@@ -29,3 +29,4 @@ Issue_UnresolvedVariable	unresolved: {0}	çözülemedi: {0}
 Issue_NotExpanded	not expanded: PATH is REG_SZ	genişletilmiyor: PATH REG_SZ
 Issue_NotFullyQualified	relative path	göreli yol
 Issue_ValueTooLong	value too long: {0} > {1} characters	değer çok uzun: {0} > {1} karakter
+Snapshot_BeforePlan	Before: {0}	Önce: {0}

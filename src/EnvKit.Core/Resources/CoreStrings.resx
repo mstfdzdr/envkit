@@ -32,4 +32,5 @@
   <data name="Issue_NotExpanded" xml:space="preserve"><value>not expanded: PATH is REG_SZ</value></data>
   <data name="Issue_NotFullyQualified" xml:space="preserve"><value>relative path</value></data>
   <data name="Issue_ValueTooLong" xml:space="preserve"><value>value too long: {0} &gt; {1} characters</value></data>
+  <data name="Snapshot_BeforePlan" xml:space="preserve"><value>Before: {0}</value></data>
 </root>

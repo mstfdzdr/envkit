@@ -27,7 +27,7 @@ internal static class SnapshotCommands
             foreach (var info in snapshots)
             {
                 var local = info.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                services.Out.WriteLine($"{info.Id}  {local}  {info.Reason}");
+                services.Out.WriteLine($"{info.Id}  {local}  {info.DisplayReason}");
             }
 
             return ExitCodes.Ok;

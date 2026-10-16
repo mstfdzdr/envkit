@@ -55,7 +55,8 @@ public sealed partial class HistoryViewModel : PageViewModel
 
     public override void OnLanguageChanged()
     {
-        OnSelectedChanged(Selected);
+        // Reloaded rather than re-notified: the list items are records whose texts are read once.
+        Refresh();
         base.OnLanguageChanged();
     }
 

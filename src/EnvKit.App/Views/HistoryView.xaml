@@ -26,7 +26,7 @@
         <DataTemplate>
           <StackPanel Margin="0,4">
             <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" FontWeight="SemiBold" />
-            <TextBlock Text="{Binding Reason}" Style="{StaticResource Muted}" />
+            <TextBlock Text="{Binding DisplayReason}" Style="{StaticResource Muted}" />
           </StackPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>

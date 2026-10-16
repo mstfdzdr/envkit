@@ -281,3 +281,7 @@ Settings_UpToDate	You have the latest version.	En son sürümü kullanıyorsunuz
 Settings_UpdateReady	Version {0} is ready: restart to update.	{0} sürümü hazır: güncellemek için yeniden başlatın.
 Settings_NotInstalled	Updates work in the installed app; this copy runs from a build folder.	Güncellemeler kurulu uygulamada çalışır; bu kopya bir derleme klasöründen çalışıyor.
 Settings_UpdateFailed	Could not check for updates: {0}	Güncellemeler denetlenemedi: {0}
+
+# Installer hooks (descriptions of the PATH changes they make, shown in History)
+Install_AddToPath	Install: add envkit to PATH	Kurulum: envkit PATH'e eklendi
+Uninstall_RemoveFromPath	Uninstall: remove envkit from PATH	Kaldırma: envkit PATH'ten çıkarıldı

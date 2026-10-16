@@ -260,4 +260,6 @@
   <data name="Settings_UpdateReady" xml:space="preserve"><value>{0} sürümü hazır: güncellemek için yeniden başlatın.</value></data>
   <data name="Settings_NotInstalled" xml:space="preserve"><value>Güncellemeler kurulu uygulamada çalışır; bu kopya bir derleme klasöründen çalışıyor.</value></data>
   <data name="Settings_UpdateFailed" xml:space="preserve"><value>Güncellemeler denetlenemedi: {0}</value></data>
+  <data name="Install_AddToPath" xml:space="preserve"><value>Kurulum: envkit PATH&apos;e eklendi</value></data>
+  <data name="Uninstall_RemoveFromPath" xml:space="preserve"><value>Kaldırma: envkit PATH&apos;ten çıkarıldı</value></data>
 </root>

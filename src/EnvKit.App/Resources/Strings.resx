@@ -260,4 +260,6 @@
   <data name="Settings_UpdateReady" xml:space="preserve"><value>Version {0} is ready: restart to update.</value></data>
   <data name="Settings_NotInstalled" xml:space="preserve"><value>Updates work in the installed app; this copy runs from a build folder.</value></data>
   <data name="Settings_UpdateFailed" xml:space="preserve"><value>Could not check for updates: {0}</value></data>
+  <data name="Install_AddToPath" xml:space="preserve"><value>Install: add envkit to PATH</value></data>
+  <data name="Uninstall_RemoveFromPath" xml:space="preserve"><value>Uninstall: remove envkit from PATH</value></data>
 </root>

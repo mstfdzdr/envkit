@@ -1,4 +1,6 @@
 using System.IO;
+using EnvKit.App.Localization;
+using EnvKit.App.Settings;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
@@ -53,7 +55,9 @@ public static class Program
                 : builder.RemovePathEntry(CliDirectory, EnvScope.User) > 0;
             if (changed)
             {
-                var plan = builder.Build(add ? "Install: add envkit to PATH" : "Uninstall: remove envkit from PATH");
+                // The description is stored with the snapshot, so it is written in the language History will show.
+                Loc.Instance.SetCulture(AppInfo.Resolve(new FileSettingsStore(FileSettingsStore.DefaultPath).Load().Language));
+                var plan = builder.Build(Loc.Get(add ? "Install_AddToPath" : "Uninstall_RemoveFromPath"));
                 new PlanApplier(store, new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()), new SettingChangeBroadcaster())
                     .Apply(plan);
             }
