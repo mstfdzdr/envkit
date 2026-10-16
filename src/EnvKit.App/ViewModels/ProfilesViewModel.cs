@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.Profiles;
 using EnvKit.Core.Vault;
 using Wpf.Ui.Controls;
@@ -57,7 +58,7 @@ public sealed partial class ProfilesViewModel : PageViewModel
     private readonly MainViewModel _main;
 
     public ProfilesViewModel(AppServices services, MainViewModel main)
-        : base("Profiles", SymbolRegular.Layer24)
+        : base("Page_Profiles", SymbolRegular.Layer24)
     {
         _services = services;
         _main = main;
@@ -104,6 +105,12 @@ public sealed partial class ProfilesViewModel : PageViewModel
 
         Selected = Profiles.FirstOrDefault(p => string.Equals(p.Name, keep, StringComparison.OrdinalIgnoreCase));
         OnSelectedChanged(Selected);
+    }
+
+    public override void OnLanguageChanged()
+    {
+        UpdateMissingSecrets(Selected);
+        base.OnLanguageChanged();
     }
 
     partial void OnSelectedChanged(Profile? value)
@@ -160,12 +167,12 @@ public sealed partial class ProfilesViewModel : PageViewModel
             profile.Validate();
             if (profile.Actions.Count == 0)
             {
-                throw new ArgumentException("A profile needs at least one action.");
+                throw new ArgumentException(Loc.Get("Profiles_NeedsAction"));
             }
         }
         catch (ArgumentException ex)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Invalid profile", ex.Message);
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Profiles_Invalid"), ex.Message);
             return;
         }
 
@@ -174,7 +181,7 @@ public sealed partial class ProfilesViewModel : PageViewModel
         {
             if (_services.Profiles.Get(profile.Name) is not null)
             {
-                _main.ShowStatus(InfoBarSeverity.Error, "Name taken", $"A profile named '{profile.Name}' already exists.");
+                _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Profiles_NameTaken"), Loc.Format("Profiles_NameTakenMessage", profile.Name));
                 return;
             }
         }
@@ -187,7 +194,7 @@ public sealed partial class ProfilesViewModel : PageViewModel
 
         Refresh();
         Selected = Profiles.FirstOrDefault(p => p.Name == profile.Name);
-        _main.ShowStatus(InfoBarSeverity.Success, "Profile saved", $"Saved '{profile.Name}'. Nothing changes until you apply or run it.");
+        _main.ShowStatus(InfoBarSeverity.Success, Loc.Get("Profiles_Saved"), Loc.Format("Profiles_SavedMessage", profile.Name));
     }
 
     private bool HasSelection() => Selected is not null;
@@ -197,11 +204,12 @@ public sealed partial class ProfilesViewModel : PageViewModel
     {
         try
         {
-            _main.RequestReview(_services.NewPlan().Apply(Selected!).Build($"Apply profile {Selected!.Name}"));
+            _main.RequestReview(_services.NewPlan().Apply(Selected!).Build(Loc.Format("Profiles_ApplyDescription", Selected!.Name)));
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
-            _main.ShowStatus(InfoBarSeverity.Warning, "Run only", ex.Message);
+            // The only refusal here: the profile uses vault secrets.
+            _main.ShowStatus(InfoBarSeverity.Warning, Loc.Get("Profiles_RunOnly"), Loc.Format("Profiles_RunOnlyMessage", Selected!.Name));
         }
     }
 
@@ -212,7 +220,7 @@ public sealed partial class ProfilesViewModel : PageViewModel
         _services.Profiles.Delete(name);
         Selected = null;
         Refresh();
-        _main.ShowStatus(InfoBarSeverity.Informational, "Profile deleted", $"Deleted '{name}'. Changes it already applied stay; undo them from History.");
+        _main.ShowStatus(InfoBarSeverity.Informational, Loc.Get("Profiles_Deleted"), Loc.Format("Profiles_DeletedMessage", name));
     }
 
     private void MoveAction(int offset)
@@ -237,6 +245,6 @@ public sealed partial class ProfilesViewModel : PageViewModel
             .Where(n => _services.Vault.Get(n) is null)
             .Distinct(VaultNames.Comparer)
             .ToList() ?? [];
-        MissingSecrets = missing.Count == 0 ? string.Empty : $"Not in the vault yet: {string.Join(", ", missing)}";
+        MissingSecrets = missing.Count == 0 ? string.Empty : Loc.Format("Profiles_Missing", string.Join(", ", missing));
     }
 }

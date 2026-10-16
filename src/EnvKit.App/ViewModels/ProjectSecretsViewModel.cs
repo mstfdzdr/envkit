@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.DotEnv;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Security;
@@ -14,16 +15,16 @@ namespace EnvKit.App.ViewModels;
 public sealed record SecretFileRow(ProjectSecretFile File, string Root)
 {
     public string Title => File.Format == FileFormat.UserSecrets
-        ? $"User secrets · {System.IO.Path.GetFileName(File.Project)}"
+        ? Loc.Format("Proj_UserSecretsTitle", System.IO.Path.GetFileName(File.Project))
         : System.IO.Path.GetRelativePath(Root, File.Path);
 
     public string Detail => File.Format == FileFormat.UserSecrets
         ? System.IO.Path.GetRelativePath(Root, File.Project!)
-        : File.IsTemplate ? "template" : string.Empty;
+        : File.IsTemplate ? Loc.Get("Proj_Template") : string.Empty;
 
-    public string Warnings => string.Join(" · ", File.WarningList.Select(w => w == SecretFileWarning.Committed
-        ? "committed to git"
-        : "not in .gitignore"));
+    public string Warnings => string.Join(" · ", File.WarningList.Select(w => Loc.Get(w == SecretFileWarning.Committed
+        ? "Proj_Committed"
+        : "Proj_NotIgnored")));
 
     public bool HasWarnings => File.WarningList.Count > 0;
 }
@@ -47,8 +48,11 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
     private readonly AppServices _services;
     private readonly MainViewModel _main;
 
+    /// <summary>The last scan, kept as data so its summary can be rebuilt in another language.</summary>
+    private (bool? Found, int Count, int Warned, string Root) _scanState = (null, 0, 0, string.Empty);
+
     public ProjectSecretsViewModel(AppServices services, MainViewModel main)
-        : base("Project secrets", SymbolRegular.DocumentLock24)
+        : base("Page_ProjectSecrets", SymbolRegular.DocumentLock24)
     {
         _services = services;
         _main = main;
@@ -66,7 +70,7 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
     public partial bool IsScanning { get; set; }
 
     [ObservableProperty]
-    public partial string ScanSummary { get; set; } = "Choose a folder to find .env files and user secrets.";
+    public partial string ScanSummary { get; set; } = Loc.Get("Proj_Intro");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDotEnv), nameof(HasFile))]
@@ -106,6 +110,31 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
 
     public override void Refresh() => LoadEntries();
 
+    /// <summary>File rows and the scan summary are texts: rebuild them for the same results.</summary>
+    public override void OnLanguageChanged()
+    {
+        var keep = SelectedFile?.File;
+        var rows = Files.Select(r => r with { }).ToList();
+        Files.Clear();
+        foreach (var row in rows)
+        {
+            Files.Add(row);
+        }
+
+        SelectedFile = Files.FirstOrDefault(r => r.File == keep);
+        ScanSummary = Summarize(_scanState);
+        LoadEntries();
+        base.OnLanguageChanged();
+    }
+
+    private static string Summarize((bool? Found, int Count, int Warned, string Root) state) => state.Found switch
+    {
+        null when state.Root.Length == 0 => Loc.Get("Proj_Intro"),
+        null => Loc.Format("Proj_Missing", state.Root),
+        _ when state.Warned > 0 => Loc.Format("Proj_FoundWarned", state.Count, state.Warned),
+        _ => Loc.Format("Proj_Found", state.Count),
+    };
+
     private bool CanScan() => Folder.Trim().Length > 0 && !IsScanning;
 
     [RelayCommand(CanExecute = nameof(CanScan))]
@@ -114,12 +143,13 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
         var root = Folder.Trim();
         if (!Directory.Exists(root))
         {
-            ScanSummary = $"{root} does not exist.";
+            _scanState = (null, 0, 0, root);
+            ScanSummary = Loc.Format("Proj_Missing", root);
             return;
         }
 
         IsScanning = true;
-        ScanSummary = "Scanning…";
+        ScanSummary = Loc.Get("Proj_Scanning");
         try
         {
             // git is asked once per .env file, which takes a moment on large trees.
@@ -131,7 +161,8 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
             }
 
             var warned = found.Count(f => f.WarningList.Count > 0);
-            ScanSummary = $"{found.Count} found" + (warned > 0 ? $", {warned} with git warnings" : string.Empty);
+            _scanState = (true, found.Count, warned, root);
+            ScanSummary = Summarize(_scanState);
             SelectedFile = Files.FirstOrDefault();
         }
         finally
@@ -166,11 +197,11 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
         var keepCurrent = EditValue.Length == 0 && SelectedEntry is { IsSecret: true } entry && entry.Key == key && !RevealSecrets;
         if (keepCurrent)
         {
-            _main.ShowStatus(InfoBarSeverity.Informational, "Nothing to change", "Type a new value to replace the hidden one.");
+            _main.ShowStatus(InfoBarSeverity.Informational, Loc.Get("Status_NothingToChange"), Loc.Get("Proj_Unchanged"));
             return;
         }
 
-        Review(builder => Edit(builder, d => d.Set(key, EditValue), s => s.Set(key, EditValue)), $"Set {key}");
+        Review(builder => Edit(builder, d => d.Set(key, EditValue), s => s.Set(key, EditValue)), file => Loc.Format("Proj_SetDescription", key, file));
     }
 
     private bool CanChangeEntry() => CanEdit() && SelectedEntry is not null;
@@ -179,7 +210,7 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
     private void Delete()
     {
         var key = SelectedEntry!.Key;
-        Review(builder => Edit(builder, d => d.Remove(key), s => s.Remove(key)), $"Remove {key}");
+        Review(builder => Edit(builder, d => d.Remove(key), s => s.Remove(key)), file => Loc.Format("Proj_RemoveDescription", key, file));
     }
 
     private bool CanMoveToVault() =>
@@ -192,11 +223,11 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
         var (key, value, name) = (SelectedEntry!.Key, SelectedEntry.Value, VaultName.Trim());
         if (_services.Vault.Get(name) is { } existing && existing != value)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Name taken", $"The vault already has a different '{name}'.");
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Vault_NameTaken"), Loc.Format("Proj_NameTakenMessage", name));
             return;
         }
 
-        var plan = Plan(builder => builder.EditDotEnv(SelectedFile!.File.Path, d => d.Set(key, VaultReference.For(name))), $"Move {key} into the vault as {name}");
+        var plan = Plan(builder => builder.EditDotEnv(SelectedFile!.File.Path, d => d.Set(key, VaultReference.For(name))), file => Loc.Format("Proj_MoveDescription", key, name, file));
         if (plan is not null)
         {
             _main.RequestReview(plan, beforeApply: () => _services.Vault.Set(name, value));
@@ -216,7 +247,7 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
         }
     }
 
-    private void Review(Action<PlanBuilder> build, string description)
+    private void Review(Action<PlanBuilder> build, Func<string, string> description)
     {
         if (Plan(build, description) is { } plan)
         {
@@ -224,17 +255,18 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
         }
     }
 
-    private ChangePlan? Plan(Action<PlanBuilder> build, string description)
+    /// <param name="description">Given the file's title, the plan description.</param>
+    private ChangePlan? Plan(Action<PlanBuilder> build, Func<string, string> description)
     {
         try
         {
             var builder = _services.NewPlan();
             build(builder);
-            return builder.Build($"{description} in {SelectedFile!.Title}");
+            return builder.Build(description(SelectedFile!.Title));
         }
         catch (Exception ex) when (ex is ArgumentException or InvalidDataException or JsonException)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Cannot edit", ex.Message);
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Proj_CannotEdit"), ex.Message);
             return null;
         }
     }
@@ -264,21 +296,21 @@ public sealed partial class ProjectSecretsViewModel : PageViewModel
             {
                 var document = bytes is null ? DotEnvFile.Empty().Document : DotEnvFile.Parse(bytes).Document;
                 values = document.Values();
-                problems.AddRange(document.DuplicateKeys.Select(k => $"{k} is assigned more than once (the last one wins)"));
-                problems.AddRange(document.InvalidLines.Select(l => $"line {l.LineNumber} is not KEY=VALUE"));
+                problems.AddRange(document.DuplicateKeys.Select(k => Loc.Format("Proj_Duplicate", k)));
+                problems.AddRange(document.InvalidLines.Select(l => Loc.Format("Proj_InvalidLine", l.LineNumber)));
             }
             else
             {
                 values = UserSecretsDocument.Parse(bytes).Values();
                 if (bytes is null)
                 {
-                    problems.Add("no secrets.json yet: saving a key creates it");
+                    problems.Add(Loc.Get("Proj_NoSecretsYet"));
                 }
             }
         }
         catch (Exception ex) when (ex is InvalidDataException or JsonException)
         {
-            problems.Add($"read-only: {ex.Message}");
+            problems.Add(Loc.Format("Proj_ReadOnly", Loc.Get(ex is JsonException ? "Proj_NotJson" : "Proj_NotUtf8")));
             IsReadOnly = true;
         }
 

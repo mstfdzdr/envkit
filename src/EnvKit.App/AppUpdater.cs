@@ -5,6 +5,9 @@ namespace EnvKit.App;
 
 public interface IAppUpdater
 {
+    /// <summary><see langword="false"/> when running from a build folder rather than an installation.</summary>
+    bool IsInstalled { get; }
+
     /// <summary>Downloads the newest release, if there is one.</summary>
     /// <returns>Its version, or <see langword="null"/> when up to date or not installed.</returns>
     Task<string?> DownloadUpdateAsync();
@@ -20,6 +23,8 @@ public sealed class VelopackUpdater : IAppUpdater
 
     private readonly UpdateManager _manager = new(new GithubSource(RepositoryUrl, null, false, null));
     private UpdateInfo? _downloaded;
+
+    public bool IsInstalled => _manager.IsInstalled;
 
     public async Task<string?> DownloadUpdateAsync()
     {

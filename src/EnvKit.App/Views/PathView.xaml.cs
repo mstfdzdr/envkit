@@ -18,7 +18,7 @@ public partial class PathView : UserControl
 
     private void OnBrowse(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFolderDialog { Title = "Add to PATH" };
+        var dialog = new OpenFolderDialog { Title = Localization.Loc.Get("Path_BrowseTitle") };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true)
         {
             ViewModel.NewEntry = dialog.FolderName;

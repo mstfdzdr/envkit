@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             xmlns:l="clr-namespace:EnvKit.App.Localization"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:VaultViewModel}">
   <Grid>
@@ -18,14 +19,14 @@
       <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
-    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Vault" Style="{StaticResource PageTitle}" />
+    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{l:Tr Page_Vault}" Style="{StaticResource PageTitle}" />
     <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Muted}" Margin="0,0,0,12"
-               Text="Secrets here are encrypted for your Windows account and only ever reach a process through envkit run. They are never written to the persistent environment." />
+               Text="{l:Tr Vault_Intro}" />
 
     <DockPanel Grid.Row="2" Grid.Column="0">
-      <ui:Button DockPanel.Dock="Bottom" Margin="0,12,0,0" HorizontalAlignment="Stretch" Content="New secret"
+      <ui:Button DockPanel.Dock="Bottom" Margin="0,12,0,0" HorizontalAlignment="Stretch" Content="{l:Tr Vault_New}"
                  Icon="{ui:SymbolIcon Add24}" Command="{Binding NewCommand}" />
-      <ListBox ItemsSource="{Binding Names}" SelectedItem="{Binding Selected}" AutomationProperties.Name="Secrets">
+      <ListBox ItemsSource="{Binding Names}" SelectedItem="{Binding Selected}" AutomationProperties.Name="{l:Tr Vault_Secrets}">
         <ListBox.ItemTemplate>
           <DataTemplate>
             <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -39,35 +40,35 @@
 
     <ui:Card Grid.Row="2" Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Top">
       <StackPanel>
-        <TextBlock Text="Name" Margin="0,0,0,4" />
+        <TextBlock Text="{l:Tr Common_Name}" Margin="0,0,0,4" />
         <ui:TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsNew}"
-                    PlaceholderText="e.g. openai" FontFamily="Cascadia Mono, Consolas" AutomationProperties.Name="Secret name" />
+                    PlaceholderText="{l:Tr Vault_NamePlaceholder}" FontFamily="Cascadia Mono, Consolas" AutomationProperties.Name="{l:Tr Vault_SecretName}" />
 
         <TextBlock Margin="0,12,0,4" Text="{Binding ValueLabel}" />
         <ui:PasswordBox Password="{Binding EditValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        AutomationProperties.Name="Secret value" />
+                        AutomationProperties.Name="{l:Tr Vault_SecretValue}" />
 
         <StackPanel Visibility="{Binding IsNew, Converter={StaticResource InverseBoolToVisibility}}">
           <DockPanel Margin="0,12,0,0">
-            <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="Reference:" Margin="0,0,8,0" />
+            <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="{l:Tr Vault_Reference}" Margin="0,0,8,0" />
             <TextBox IsReadOnly="True" Text="{Binding Reference, Mode=OneWay}" FontFamily="Cascadia Mono, Consolas"
-                     AutomationProperties.Name="Reference" />
+                     AutomationProperties.Name="{l:Tr Vault_Reference}" />
           </DockPanel>
           <TextBlock Margin="0,8,0,0" Style="{StaticResource Muted}" Text="{Binding UsedBy}" />
 
           <DockPanel Margin="0,12,0,0">
-            <ui:Button DockPanel.Dock="Left" Content="Show value" Icon="{ui:SymbolIcon Eye24}" Command="{Binding RevealCommand}" />
+            <ui:Button DockPanel.Dock="Left" Content="{l:Tr Vault_ShowValue}" Icon="{ui:SymbolIcon Eye24}" Command="{Binding RevealCommand}" />
             <TextBox Margin="8,0,0,0" IsReadOnly="True" Text="{Binding RevealedValue, Mode=OneWay}"
                      FontFamily="Cascadia Mono, Consolas" BorderThickness="0" Background="Transparent"
                      Visibility="{Binding RevealedValue, Converter={StaticResource NullToVisibility}}"
-                     AutomationProperties.Name="Stored value" />
+                     AutomationProperties.Name="{l:Tr Vault_StoredValue}" />
           </DockPanel>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-          <ui:Button Content="Save" Appearance="Primary" Icon="{ui:SymbolIcon Save24}" Command="{Binding SaveCommand}" Margin="0,0,8,0" />
+          <ui:Button Content="{l:Tr Common_Save}" Appearance="Primary" Icon="{ui:SymbolIcon Save24}" Command="{Binding SaveCommand}" Margin="0,0,8,0" />
           <ui:Button Content="{Binding DeleteLabel}" Appearance="Danger" Icon="{ui:SymbolIcon Delete24}" Command="{Binding DeleteCommand}"
-                     ToolTip="Vault secrets are not snapshotted: deleting one cannot be undone." />
+                     ToolTip="{l:Tr Vault_DeleteTip}" />
         </StackPanel>
       </StackPanel>
     </ui:Card>

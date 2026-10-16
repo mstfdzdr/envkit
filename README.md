@@ -1,3 +1,5 @@
+<img src="src/EnvKit.App/Assets/EnvKit-128.png" alt="" width="96" align="right" />
+
 # EnvKit
 
 [![CI](https://github.com/mstfdzdr/envkit/actions/workflows/ci.yml/badge.svg)](https://github.com/mstfdzdr/envkit/actions/workflows/ci.yml)
@@ -44,6 +46,16 @@ can silently break `%VARIABLE%` references. EnvKit does those things:
   the file: comments, quoting, `export`, line endings and byte order marks stay exactly as they
   were. Move a secret out of a `.env` into the vault, leaving `${vault:NAME}` behind, and
   `envkit run --env-file .env` fills it back in for the process.
+
+## Languages and themes
+
+The desktop app speaks English and Turkish and follows the Windows language by default; switch
+it in Settings without restarting. It also follows the Windows light/dark setting, or you can
+pick one. The `envkit` command line stays in English so its output is stable for scripts.
+
+Translations live in `src/EnvKit.App/Resources/Strings.txt` (one line per text: key, English,
+Turkish); `./build/New-Resx.ps1` turns it into the `.resx` files. Adding a language means adding
+a column and a `.resx` for it.
 
 ## Install
 

@@ -11,6 +11,8 @@ using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
 using EnvKit.Windows.Variables;
 
+using EnvKit.App.Settings;
+
 namespace EnvKit.App;
 
 public sealed class AppServices
@@ -41,9 +43,18 @@ public sealed class AppServices
     /// <summary><see langword="null"/> disables update checks.</summary>
     public IAppUpdater? Updater { get; init; }
 
+    public ISettingsStore SettingsStore { get; init; } = new InMemorySettingsStore();
+
+    /// <summary>Set once the main window exists; <see langword="null"/> in tests.</summary>
+    public IThemeService? Theme { get; set; }
+
+    public IShell? Shell { get; init; }
+
     public static AppServices CreateDefault() => new()
     {
         Updater = new VelopackUpdater(),
+        SettingsStore = new FileSettingsStore(FileSettingsStore.DefaultPath),
+        Shell = new WindowsShell(),
         Store = new RegistryEnvStore(),
         Credentials = new WindowsCredentialStore(),
         Vault = new FileVault(FileVault.DefaultPath, new DpapiProtector()),

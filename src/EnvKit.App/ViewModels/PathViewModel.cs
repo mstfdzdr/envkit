@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Variables;
 using Wpf.Ui.Controls;
@@ -9,7 +10,7 @@ namespace EnvKit.App.ViewModels;
 
 public sealed record PathEntryItem(int Index, string Raw, string Expanded, string Problems)
 {
-    public string Display => Raw.Trim().Length == 0 ? "(empty)" : Raw;
+    public string Display => Raw.Trim().Length == 0 ? Loc.Get("Common_Empty") : Raw;
 
     public bool HasProblems => Problems.Length > 0;
 
@@ -29,7 +30,7 @@ public sealed partial class PathViewModel : PageViewModel
     private PathReport _report = new([], []);
 
     public PathViewModel(AppServices services, MainViewModel main)
-        : base("PATH", SymbolRegular.TextBulletListLtr24)
+        : base("Page_Path", SymbolRegular.TextBulletListLtr24)
     {
         _services = services;
         _main = main;
@@ -75,6 +76,13 @@ public sealed partial class PathViewModel : PageViewModel
         }
 
         Reanalyze();
+    }
+
+    /// <summary>Problems and summary are texts: rebuild them, keeping the working copy.</summary>
+    public override void OnLanguageChanged()
+    {
+        Reanalyze();
+        base.OnLanguageChanged();
     }
 
     /// <summary>Drag and drop.</summary>
@@ -158,7 +166,7 @@ public sealed partial class PathViewModel : PageViewModel
             }
         }
 
-        _main.RequestReview(builder.Build("Update PATH"));
+        _main.RequestReview(builder.Build(Loc.Get("Path_UpdateDescription")));
     }
 
     [RelayCommand]
@@ -177,15 +185,15 @@ public sealed partial class PathViewModel : PageViewModel
             var matches = new CommandResolver(_services.FileSystem).FindAll(command, _report, pathExt);
             for (var i = 0; i < matches.Count; i++)
             {
-                var notes = $"{matches[i].Entry.Scope}#{matches[i].Entry.Index}"
-                    + (matches[i].IsAppExecutionAlias ? ", Store alias" : string.Empty)
-                    + (i > 0 ? ", shadowed" : string.Empty);
+                var notes = $"{EnumTextConverter.Text(matches[i].Entry.Scope)}#{matches[i].Entry.Index}"
+                    + (matches[i].IsAppExecutionAlias ? ", " + Loc.Get("Which_StoreAlias") : string.Empty)
+                    + (i > 0 ? ", " + Loc.Get("Which_Shadowed") : string.Empty);
                 WhichResults.Add($"{(i == 0 ? "→" : "  ")} {matches[i].FullPath}   ({notes})");
             }
 
             if (matches.Count == 0)
             {
-                WhichResults.Add($"{command}: not found in PATH");
+                WhichResults.Add(Loc.Format("Which_NotFound", command));
             }
         }
         catch (ArgumentException ex)
@@ -218,7 +226,7 @@ public sealed partial class PathViewModel : PageViewModel
         SelectedEntry = keep is { } index && index >= 0 && index < Entries.Count ? Entries[index] : null;
 
         var problemCount = _report.Issues.Count(i => i.Scope == Scope);
-        Summary = $"{Entries.Count} entries · {(problemCount == 0 ? "no problems" : $"{problemCount} problem(s)")}";
+        Summary = Loc.Format("Path_Summary", Entries.Count, problemCount == 0 ? Loc.Get("Path_NoProblems") : Loc.Format("Path_Problems", problemCount));
         IsDirty = Scopes.Any(s => !_working[s].SequenceEqual(_original[s], StringComparer.Ordinal));
     }
 

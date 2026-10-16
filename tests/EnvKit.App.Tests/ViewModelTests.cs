@@ -258,6 +258,8 @@ public class ViewModelTests
 
     private sealed class FakeUpdater : IAppUpdater
     {
+        public bool IsInstalled => true;
+
         public string? Version { get; init; }
 
         public Exception? Failure { get; init; }

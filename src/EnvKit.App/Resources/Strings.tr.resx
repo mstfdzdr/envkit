@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>  <data name="Common_ReviewSave" xml:space="preserve"><value>İncele ve kaydet</value></data>
+  <data name="Common_New" xml:space="preserve"><value>Yeni</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Sil</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Kaydet</value></data>
+  <data name="Common_Browse" xml:space="preserve"><value>Gözat…</value></data>
+  <data name="Common_Add" xml:space="preserve"><value>Ekle</value></data>
+  <data name="Common_Remove" xml:space="preserve"><value>Kaldır</value></data>
+  <data name="Common_Revert" xml:space="preserve"><value>Geri döndür</value></data>
+  <data name="Common_MoveUp" xml:space="preserve"><value>Yukarı taşı</value></data>
+  <data name="Common_MoveDown" xml:space="preserve"><value>Aşağı taşı</value></data>
+  <data name="Common_Copy" xml:space="preserve"><value>Kopyala</value></data>
+  <data name="Common_Search" xml:space="preserve"><value>Ara</value></data>
+  <data name="Common_Name" xml:space="preserve"><value>Ad</value></data>
+  <data name="Common_Value" xml:space="preserve"><value>Değer</value></data>
+  <data name="Common_Scope" xml:space="preserve"><value>Kapsam</value></data>
+  <data name="Common_Key" xml:space="preserve"><value>Anahtar</value></data>
+  <data name="Common_Comment" xml:space="preserve"><value>Yorum</value></data>
+  <data name="Common_Description" xml:space="preserve"><value>Açıklama</value></data>
+  <data name="Common_Find" xml:space="preserve"><value>Bul</value></data>
+  <data name="Common_ShowSecrets" xml:space="preserve"><value>Gizli değerleri göster</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Vazgeç</value></data>
+  <data name="Common_Apply" xml:space="preserve"><value>Uygula</value></data>
+  <data name="Common_Empty" xml:space="preserve"><value>(boş)</value></data>
+  <data name="Page_Path" xml:space="preserve"><value>PATH</value></data>
+  <data name="Page_Variables" xml:space="preserve"><value>Değişkenler</value></data>
+  <data name="Page_Credentials" xml:space="preserve"><value>Kimlik bilgileri</value></data>
+  <data name="Page_Profiles" xml:space="preserve"><value>Profiller</value></data>
+  <data name="Page_Vault" xml:space="preserve"><value>Kasa</value></data>
+  <data name="Page_ProjectSecrets" xml:space="preserve"><value>Proje gizlileri</value></data>
+  <data name="Page_History" xml:space="preserve"><value>Geçmiş</value></data>
+  <data name="Page_Settings" xml:space="preserve"><value>Ayarlar</value></data>
+  <data name="Enum_EnvScope_User" xml:space="preserve"><value>Kullanıcı</value></data>
+  <data name="Enum_EnvScope_Machine" xml:space="preserve"><value>Sistem</value></data>
+  <data name="Enum_EnvValueKind_Literal" xml:space="preserve"><value>Düz metin</value></data>
+  <data name="Enum_EnvValueKind_Expandable" xml:space="preserve"><value>Genişletilebilir</value></data>
+  <data name="Enum_CredentialPersistence_LocalMachine" xml:space="preserve"><value>Bu bilgisayar</value></data>
+  <data name="Enum_CredentialPersistence_Enterprise" xml:space="preserve"><value>Dolaşımlı</value></data>
+  <data name="Enum_CredentialPersistence_Session" xml:space="preserve"><value>Bu oturum</value></data>
+  <data name="Enum_CredentialKind_DomainPassword" xml:space="preserve"><value>Etki alanı parolası</value></data>
+  <data name="Enum_CredentialKind_DomainCertificate" xml:space="preserve"><value>Etki alanı sertifikası</value></data>
+  <data name="Enum_CredentialKind_DomainVisiblePassword" xml:space="preserve"><value>Etki alanı parolası (görünür)</value></data>
+  <data name="Enum_CredentialKind_GenericCertificate" xml:space="preserve"><value>Sertifika</value></data>
+  <data name="Enum_CredentialKind_DomainExtended" xml:space="preserve"><value>Etki alanı (genişletilmiş)</value></data>
+  <data name="Enum_CredentialGroup_Git" xml:space="preserve"><value>Git</value></data>
+  <data name="Enum_CredentialGroup_GitHubDesktop" xml:space="preserve"><value>GitHub Desktop</value></data>
+  <data name="Enum_CredentialGroup_VisualStudio" xml:space="preserve"><value>Visual Studio</value></data>
+  <data name="Enum_CredentialGroup_VSCode" xml:space="preserve"><value>VS Code</value></data>
+  <data name="Enum_CredentialGroup_Docker" xml:space="preserve"><value>Docker</value></data>
+  <data name="Enum_CredentialGroup_RemoteDesktop" xml:space="preserve"><value>Uzak Masaüstü</value></data>
+  <data name="Enum_CredentialGroup_MicrosoftAccount" xml:space="preserve"><value>Microsoft hesabı</value></data>
+  <data name="Enum_CredentialGroup_Office" xml:space="preserve"><value>Office</value></data>
+  <data name="Enum_CredentialGroup_Network" xml:space="preserve"><value>Ağ</value></data>
+  <data name="Enum_CredentialGroup_Other" xml:space="preserve"><value>Diğer</value></data>
+  <data name="Enum_ActionKind_Set" xml:space="preserve"><value>Ayarla</value></data>
+  <data name="Enum_ActionKind_Unset" xml:space="preserve"><value>Kaldır</value></data>
+  <data name="Enum_ActionKind_PrependPath" xml:space="preserve"><value>PATH: başa ekle</value></data>
+  <data name="Enum_ActionKind_AppendPath" xml:space="preserve"><value>PATH: sona ekle</value></data>
+  <data name="Enum_ActionKind_RemovePath" xml:space="preserve"><value>PATH: çıkar</value></data>
+  <data name="Enum_ThemeChoice_System" xml:space="preserve"><value>Windows ayarını kullan</value></data>
+  <data name="Enum_ThemeChoice_Light" xml:space="preserve"><value>Açık</value></data>
+  <data name="Enum_ThemeChoice_Dark" xml:space="preserve"><value>Koyu</value></data>
+  <data name="Enum_LanguageChoice_System" xml:space="preserve"><value>Windows dilini kullan</value></data>
+  <data name="Enum_LanguageChoice_English" xml:space="preserve"><value>English</value></data>
+  <data name="Enum_LanguageChoice_Turkish" xml:space="preserve"><value>Türkçe</value></data>
+  <data name="Main_Navigation" xml:space="preserve"><value>Gezinme</value></data>
+  <data name="Main_UpdateLabel" xml:space="preserve"><value>{0} için yeniden başlat</value></data>
+  <data name="Review_Title" xml:space="preserve"><value>Değişiklikleri incele</value></data>
+  <data name="Review_Elevation" xml:space="preserve"><value>Sistem kapsamında değişiklik içeriyor: Windows yönetici onayı isteyecek.</value></data>
+  <data name="Review_Irreversible" xml:space="preserve"><value>Bazı silmeler geri alınamaz: Windows etki alanı kimlik bilgilerinin gizli bilgisini hiçbir zaman vermez.</value></data>
+  <data name="Status_NothingToChange" xml:space="preserve"><value>Değişecek bir şey yok</value></data>
+  <data name="Status_NothingToChangeMessage" xml:space="preserve"><value>Düzenlemeler kayıtlı olanla aynı.</value></data>
+  <data name="Status_NothingChanged" xml:space="preserve"><value>Hiçbir şey değiştirilmedi</value></data>
+  <data name="Status_Applied" xml:space="preserve"><value>Değişiklikler uygulandı</value></data>
+  <data name="Status_AppliedMessage" xml:space="preserve"><value>{0} anlık görüntüsü kaydedildi; Geçmiş&apos;ten geri yükleyebilirsiniz.</value></data>
+  <data name="Status_Propagation" xml:space="preserve"><value>Yeni açılan terminaller değişikliği görür, açık olanlar eski ortamla devam eder.</value></data>
+  <data name="Status_Cancelled" xml:space="preserve"><value>İptal edildi</value></data>
+  <data name="Status_ElevationDeclined" xml:space="preserve"><value>Yönetici onayı verilmedi; hiçbir şey değiştirilmedi.</value></data>
+  <data name="Status_AdminNeeded" xml:space="preserve"><value>Yönetici yetkisi gerekli</value></data>
+  <data name="Status_AdminNeededMessage" xml:space="preserve"><value>Sistem kapsamındaki değişiklikler yönetici yetkisi gerektirir. Hiçbir şey değiştirilmedi.</value></data>
+  <data name="Status_MachineFailed" xml:space="preserve"><value>Sistem değişiklikleri başarısız oldu</value></data>
+  <data name="Status_MachineFailedMessage" xml:space="preserve"><value>{0} Bu plandaki kullanıcı kapsamı değişiklikleri geri alındı.</value></data>
+  <data name="Status_Conflict" xml:space="preserve"><value>Başka bir yerde değiştirildi</value></data>
+  <data name="Status_ConflictMessage" xml:space="preserve"><value>{0} Görünüm yeniden yüklendi; düzenlemeyi tekrar yapın.</value></data>
+  <data name="Status_Partial" xml:space="preserve"><value>Kısmen uygulandı</value></data>
+  <data name="Path_Fix" xml:space="preserve"><value>Boş ve tekrarları düzelt</value></data>
+  <data name="Path_RemoveMissing" xml:space="preserve"><value>Olmayanları kaldır</value></data>
+  <data name="Path_RemoveMissingTip" xml:space="preserve"><value>Var olmayan klasörleri kaldırır. Önce çıkarılabilir ve ağ sürücülerini kontrol edin.</value></data>
+  <data name="Path_Entries" xml:space="preserve"><value>PATH girdileri</value></data>
+  <data name="Path_Directory" xml:space="preserve"><value>Klasör</value></data>
+  <data name="Path_DirectoryPlaceholder" xml:space="preserve"><value>Klasör, örn. %USERPROFILE%\bin</value></data>
+  <data name="Path_Replace" xml:space="preserve"><value>Değiştir</value></data>
+  <data name="Path_WhichPlaceholder" xml:space="preserve"><value>Hangi komut çalışır? örn. python</value></data>
+  <data name="Path_CommandName" xml:space="preserve"><value>Komut adı</value></data>
+  <data name="Path_Summary" xml:space="preserve"><value>{0} girdi · {1}</value></data>
+  <data name="Path_NoProblems" xml:space="preserve"><value>sorun yok</value></data>
+  <data name="Path_Problems" xml:space="preserve"><value>{0} sorun</value></data>
+  <data name="Path_UpdateDescription" xml:space="preserve"><value>PATH&apos;i güncelle</value></data>
+  <data name="Path_BrowseTitle" xml:space="preserve"><value>PATH&apos;e ekle</value></data>
+  <data name="Which_StoreAlias" xml:space="preserve"><value>Store kısayolu</value></data>
+  <data name="Which_Shadowed" xml:space="preserve"><value>gölgede kalıyor</value></data>
+  <data name="Which_NotFound" xml:space="preserve"><value>{0}: PATH&apos;te bulunamadı</value></data>
+  <data name="Vars_SearchPlaceholder" xml:space="preserve"><value>Ad ve değerlerde ara</value></data>
+  <data name="Vars_Kind" xml:space="preserve"><value>Tür</value></data>
+  <data name="Vars_NewTitle" xml:space="preserve"><value>Yeni değişken</value></data>
+  <data name="Vars_EditTitle" xml:space="preserve"><value>Değişkeni düzenle</value></data>
+  <data name="Vars_Hidden" xml:space="preserve"><value>Bu bir gizli bilgiye benziyor, bu yüzden gizlendi. Görmek veya düzenlemek için &apos;Gizli değerleri göster&apos;i açın.</value></data>
+  <data name="Vars_Expand" xml:space="preserve"><value>%DEĞİŞKENLER%&apos;i genişlet (REG__EXPAND__SZ)</value></data>
+  <data name="Vars_ExpandsTo" xml:space="preserve"><value>Genişletilmiş hali: {0}</value></data>
+  <data name="Vars_Invalid" xml:space="preserve"><value>Geçersiz değişken</value></data>
+  <data name="Vars_SetDescription" xml:space="preserve"><value>{0}\{1} ayarla</value></data>
+  <data name="Vars_DeleteDescription" xml:space="preserve"><value>{0}\{1} sil</value></data>
+  <data name="Creds_Tool" xml:space="preserve"><value>Araç</value></data>
+  <data name="Creds_SearchPlaceholder" xml:space="preserve"><value>Hedef ve kullanıcı adlarında ara</value></data>
+  <data name="Creds_SelectForDelete" xml:space="preserve"><value>Silmek için seç</value></data>
+  <data name="Creds_Target" xml:space="preserve"><value>Hedef</value></data>
+  <data name="Creds_User" xml:space="preserve"><value>Kullanıcı</value></data>
+  <data name="Creds_Type" xml:space="preserve"><value>Tür</value></data>
+  <data name="Creds_Written" xml:space="preserve"><value>Yazıldı</value></data>
+  <data name="Creds_DeleteTip" xml:space="preserve"><value>İşaretli kimlik bilgilerini veya seçili olanı siler. Geçmiş&apos;ten geri alınabilir.</value></data>
+  <data name="Creds_Export" xml:space="preserve"><value>Envanteri dışa aktar…</value></data>
+  <data name="Creds_ExportTip" xml:space="preserve"><value>Hedefleri, kullanıcıları ve tarihleri JSON olarak yazar. Gizli bilgi içermez.</value></data>
+  <data name="Creds_ExportDialog" xml:space="preserve"><value>Kimlik bilgisi envanterini dışa aktar (gizli bilgi yok)</value></data>
+  <data name="Creds_ReadOnly" xml:space="preserve"><value>Windows bu etki alanı kimlik bilgisinin gizli bilgisini paylaşmaz; silinebilir ama düzenlenemez.</value></data>
+  <data name="Creds_UserName" xml:space="preserve"><value>Kullanıcı adı</value></data>
+  <data name="Creds_ShowPassword" xml:space="preserve"><value>Parolayı göster</value></data>
+  <data name="Creds_StoredPassword" xml:space="preserve"><value>Kayıtlı parola</value></data>
+  <data name="Creds_Persistence" xml:space="preserve"><value>Kalıcılık</value></data>
+  <data name="Creds_All" xml:space="preserve"><value>Tümü ({0})</value></data>
+  <data name="Creds_GroupCount" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Creds_NewTitle" xml:space="preserve"><value>Yeni kimlik bilgisi</value></data>
+  <data name="Creds_EditTitle" xml:space="preserve"><value>Kimlik bilgisini düzenle</value></data>
+  <data name="Creds_PasswordNew" xml:space="preserve"><value>Parola</value></data>
+  <data name="Creds_PasswordEdit" xml:space="preserve"><value>Yeni parola (mevcut parolayı korumak için boş bırakın)</value></data>
+  <data name="Creds_Shown" xml:space="preserve"><value>{0} gösteriliyor</value></data>
+  <data name="Creds_Delete" xml:space="preserve"><value>Sil…</value></data>
+  <data name="Creds_DeleteMany" xml:space="preserve"><value>{0} tanesini sil…</value></data>
+  <data name="Creds_Invalid" xml:space="preserve"><value>Geçersiz kimlik bilgisi</value></data>
+  <data name="Creds_SetDescription" xml:space="preserve"><value>{0} kimlik bilgisini ayarla</value></data>
+  <data name="Creds_DeleteDescription" xml:space="preserve"><value>{0} kimlik bilgisini sil</value></data>
+  <data name="Creds_Exported" xml:space="preserve"><value>Dışa aktarıldı</value></data>
+  <data name="Creds_ExportedMessage" xml:space="preserve"><value>{0} kimlik bilgisi {1} dosyasına yazıldı. Gizli bilgi içermez.</value></data>
+  <data name="Profiles_New" xml:space="preserve"><value>Yeni profil</value></data>
+  <data name="Profiles_NamePlaceholder" xml:space="preserve"><value>örn. java21</value></data>
+  <data name="Profiles_ProfileName" xml:space="preserve"><value>Profil adı</value></data>
+  <data name="Profiles_Actions" xml:space="preserve"><value>Eylemler (sırayla uygulanır)</value></data>
+  <data name="Profiles_AddAction" xml:space="preserve"><value>Eylem ekle</value></data>
+  <data name="Profiles_RemoveAction" xml:space="preserve"><value>Eylemi kaldır</value></data>
+  <data name="Profiles_Action" xml:space="preserve"><value>Eylem</value></data>
+  <data name="Profiles_Variable" xml:space="preserve"><value>Değişken</value></data>
+  <data name="Profiles_ValueOrDirectory" xml:space="preserve"><value>Değer veya klasör</value></data>
+  <data name="Profiles_Hint" xml:space="preserve"><value>Değerlerde %DEĞİŞKENLER% (sırayla genişletilir; %JAVA_HOME%\bin yukarıda ayarlanan JAVA_HOME&apos;u izler) ve kasadaki gizli bilgiler için ${vault:AD} kullanılabilir.</value></data>
+  <data name="Profiles_RunWith" xml:space="preserve"><value>Bununla çalıştır:</value></data>
+  <data name="Profiles_RunCommand" xml:space="preserve"><value>Çalıştırma komutu</value></data>
+  <data name="Profiles_SaveProfile" xml:space="preserve"><value>Profili kaydet</value></data>
+  <data name="Profiles_Apply" xml:space="preserve"><value>Ortamıma uygula…</value></data>
+  <data name="Profiles_ApplyTip" xml:space="preserve"><value>Kayıtlı profili incelemeden sonra kullanıcı ortamına yazar. Kasa kullanan profiller yalnızca çalıştırılabilir.</value></data>
+  <data name="Profiles_Missing" xml:space="preserve"><value>Henüz kasada değil: {0}</value></data>
+  <data name="Profiles_Invalid" xml:space="preserve"><value>Geçersiz profil</value></data>
+  <data name="Profiles_NeedsAction" xml:space="preserve"><value>Bir profilin en az bir eylemi olmalı.</value></data>
+  <data name="Profiles_NameTaken" xml:space="preserve"><value>Ad kullanımda</value></data>
+  <data name="Profiles_NameTakenMessage" xml:space="preserve"><value>&apos;{0}&apos; adlı bir profil zaten var.</value></data>
+  <data name="Profiles_Saved" xml:space="preserve"><value>Profil kaydedildi</value></data>
+  <data name="Profiles_SavedMessage" xml:space="preserve"><value>&apos;{0}&apos; kaydedildi. Uygulayana veya çalıştırana kadar hiçbir şey değişmez.</value></data>
+  <data name="Profiles_RunOnly" xml:space="preserve"><value>Yalnızca çalıştırılabilir</value></data>
+  <data name="Profiles_RunOnlyMessage" xml:space="preserve"><value>&apos;{0}&apos; kasadaki gizli bilgileri kullanıyor; EnvKit bunları kalıcı ortama asla yazmaz. Şöyle kullanın: envkit run -p {0} -- &lt;komut&gt;</value></data>
+  <data name="Profiles_ApplyDescription" xml:space="preserve"><value>{0} profilini uygula</value></data>
+  <data name="Profiles_Deleted" xml:space="preserve"><value>Profil silindi</value></data>
+  <data name="Profiles_DeletedMessage" xml:space="preserve"><value>&apos;{0}&apos; silindi. Daha önce uyguladığı değişiklikler duruyor; Geçmiş&apos;ten geri alabilirsiniz.</value></data>
+  <data name="Vault_Intro" xml:space="preserve"><value>Buradaki gizli bilgiler Windows hesabınız için şifrelenir ve bir process&apos;e yalnızca envkit run ile ulaşır. Kalıcı ortama asla yazılmaz.</value></data>
+  <data name="Vault_New" xml:space="preserve"><value>Yeni gizli bilgi</value></data>
+  <data name="Vault_Secrets" xml:space="preserve"><value>Gizli bilgiler</value></data>
+  <data name="Vault_NamePlaceholder" xml:space="preserve"><value>örn. openai</value></data>
+  <data name="Vault_SecretName" xml:space="preserve"><value>Gizli bilgi adı</value></data>
+  <data name="Vault_SecretValue" xml:space="preserve"><value>Gizli değer</value></data>
+  <data name="Vault_ValueNew" xml:space="preserve"><value>Değer</value></data>
+  <data name="Vault_ValueEdit" xml:space="preserve"><value>Yeni değer (kayıtlı olanın yerine geçer)</value></data>
+  <data name="Vault_Reference" xml:space="preserve"><value>Referans:</value></data>
+  <data name="Vault_ShowValue" xml:space="preserve"><value>Değeri göster</value></data>
+  <data name="Vault_StoredValue" xml:space="preserve"><value>Kayıtlı değer</value></data>
+  <data name="Vault_DeleteConfirm" xml:space="preserve"><value>Silmek için tekrar tıklayın</value></data>
+  <data name="Vault_DeleteTip" xml:space="preserve"><value>Kasa gizli bilgileri anlık görüntüye alınmaz: silme geri alınamaz.</value></data>
+  <data name="Vault_UsedBy" xml:space="preserve"><value>Kullanan profiller: {0}</value></data>
+  <data name="Vault_NotUsed" xml:space="preserve"><value>Hiçbir profil kullanmıyor.</value></data>
+  <data name="Vault_NameTaken" xml:space="preserve"><value>Ad kullanımda</value></data>
+  <data name="Vault_NameTakenMessage" xml:space="preserve"><value>Kasada zaten &apos;{0}&apos; var; değerini değiştirmek için onu seçin.</value></data>
+  <data name="Vault_Stored" xml:space="preserve"><value>Gizli bilgi kaydedildi</value></data>
+  <data name="Vault_StoredMessage" xml:space="preserve"><value>Bir profilde {0} olarak kullanın.</value></data>
+  <data name="Vault_Deleted" xml:space="preserve"><value>Gizli bilgi silindi</value></data>
+  <data name="Vault_DeletedMessage" xml:space="preserve"><value>&apos;{0}&apos; silindi.</value></data>
+  <data name="Proj_FolderPlaceholder" xml:space="preserve"><value>Taranacak klasör, örn. C:\dev</value></data>
+  <data name="Proj_Folder" xml:space="preserve"><value>Klasör</value></data>
+  <data name="Proj_Scan" xml:space="preserve"><value>Tara</value></data>
+  <data name="Proj_Files" xml:space="preserve"><value>Dosyalar</value></data>
+  <data name="Proj_Keys" xml:space="preserve"><value>Anahtarlar</value></data>
+  <data name="Proj_ValueHint" xml:space="preserve"><value>Değer (boş bırakılırsa gizli değer korunur)</value></data>
+  <data name="Proj_RemoveKey" xml:space="preserve"><value>Anahtarı kaldır</value></data>
+  <data name="Proj_MoveTitle" xml:space="preserve"><value>Kasaya taşı</value></data>
+  <data name="Proj_MoveHint" xml:space="preserve"><value>Değeri kasaya koyar ve dosyada ${vault:AD} bırakır; envkit run --env-file değeri geri doldurur.</value></data>
+  <data name="Proj_Move" xml:space="preserve"><value>Taşı…</value></data>
+  <data name="Proj_VaultName" xml:space="preserve"><value>Kasa adı</value></data>
+  <data name="Proj_VaultNamePlaceholder" xml:space="preserve"><value>kasa adı</value></data>
+  <data name="Proj_BrowseTitle" xml:space="preserve"><value>.env dosyaları ve user secrets için taranacak klasör</value></data>
+  <data name="Proj_Intro" xml:space="preserve"><value>.env dosyalarını ve user secrets&apos;ları bulmak için bir klasör seçin.</value></data>
+  <data name="Proj_Missing" xml:space="preserve"><value>{0} bulunamadı.</value></data>
+  <data name="Proj_Scanning" xml:space="preserve"><value>Taranıyor…</value></data>
+  <data name="Proj_Found" xml:space="preserve"><value>{0} bulundu</value></data>
+  <data name="Proj_FoundWarned" xml:space="preserve"><value>{0} bulundu, {1} tanesinde git uyarısı var</value></data>
+  <data name="Proj_UserSecretsTitle" xml:space="preserve"><value>User secrets · {0}</value></data>
+  <data name="Proj_Template" xml:space="preserve"><value>şablon</value></data>
+  <data name="Proj_Committed" xml:space="preserve"><value>git&apos;e commit edilmiş</value></data>
+  <data name="Proj_NotIgnored" xml:space="preserve"><value>.gitignore&apos;da değil</value></data>
+  <data name="Proj_Duplicate" xml:space="preserve"><value>{0} birden fazla kez atanmış (sonuncusu geçerli)</value></data>
+  <data name="Proj_InvalidLine" xml:space="preserve"><value>{0}. satır ANAHTAR=DEĞER biçiminde değil</value></data>
+  <data name="Proj_NoSecretsYet" xml:space="preserve"><value>henüz secrets.json yok: bir anahtar kaydedince oluşturulur</value></data>
+  <data name="Proj_ReadOnly" xml:space="preserve"><value>salt okunur: {0}</value></data>
+  <data name="Proj_NotUtf8" xml:space="preserve"><value>dosya geçerli UTF-8 değil</value></data>
+  <data name="Proj_NotJson" xml:space="preserve"><value>secrets.json geçerli JSON değil</value></data>
+  <data name="Proj_Unchanged" xml:space="preserve"><value>Gizli değeri değiştirmek için yeni bir değer yazın.</value></data>
+  <data name="Proj_CannotEdit" xml:space="preserve"><value>Düzenlenemiyor</value></data>
+  <data name="Proj_SetDescription" xml:space="preserve"><value>{1} içinde {0} ayarla</value></data>
+  <data name="Proj_RemoveDescription" xml:space="preserve"><value>{1} içinden {0} kaldır</value></data>
+  <data name="Proj_MoveDescription" xml:space="preserve"><value>{2} içindeki {0} değerini kasaya {1} adıyla taşı</value></data>
+  <data name="Proj_NameTakenMessage" xml:space="preserve"><value>Kasada farklı bir &apos;{0}&apos; zaten var.</value></data>
+  <data name="History_Snapshots" xml:space="preserve"><value>Anlık görüntüler</value></data>
+  <data name="History_Restore" xml:space="preserve"><value>Geri yükle…</value></data>
+  <data name="History_Select" xml:space="preserve"><value>Geri yüklemenin neleri değiştireceğini görmek için bir anlık görüntü seçin.</value></data>
+  <data name="History_None" xml:space="preserve"><value>Henüz anlık görüntü yok. Her değişiklikten önce otomatik olarak alınır.</value></data>
+  <data name="History_Unreadable" xml:space="preserve"><value>Bu anlık görüntü okunamıyor: {0}</value></data>
+  <data name="History_Matches" xml:space="preserve"><value>Mevcut durum bu anlık görüntüyle aynı.</value></data>
+  <data name="History_WouldChange" xml:space="preserve"><value>Geri yükleme şu değişiklikleri yapar:</value></data>
+  <data name="History_RestoreDescription" xml:space="preserve"><value>{0} tarihli anlık görüntüyü geri yükle</value></data>
+  <data name="Settings_Appearance" xml:space="preserve"><value>Görünüm</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Tema</value></data>
+  <data name="Settings_ThemeHint" xml:space="preserve"><value>&quot;Windows ayarını kullan&quot; Windows&apos;u izler; Windows açık ve koyu arasında geçiş yaptığında uygulama da geçer.</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Dil</value></data>
+  <data name="Settings_LanguageHint" xml:space="preserve"><value>Hemen uygulanır. envkit komut satırı İngilizce kalır.</value></data>
+  <data name="Settings_Data" xml:space="preserve"><value>Veriler</value></data>
+  <data name="Settings_DataHint" xml:space="preserve"><value>Anlık görüntüler, profiller, kasa ve bu ayarlar burada durur; gizli bilgi içerenler Windows hesabınız için şifrelenir.</value></data>
+  <data name="Settings_OpenFolder" xml:space="preserve"><value>Klasörü aç</value></data>
+  <data name="Settings_About" xml:space="preserve"><value>Hakkında</value></data>
+  <data name="Settings_Tagline" xml:space="preserve"><value>Windows ortam değişkenlerini, PATH&apos;i ve kimlik bilgilerini güvenle yönetin.</value></data>
+  <data name="Settings_Version" xml:space="preserve"><value>Sürüm {0}</value></data>
+  <data name="Settings_Author" xml:space="preserve"><value>Geliştiren: Mustafa Dizdar</value></data>
+  <data name="Settings_Profile" xml:space="preserve"><value>GitHub profili</value></data>
+  <data name="Settings_Repository" xml:space="preserve"><value>GitHub&apos;daki kaynak kodu</value></data>
+  <data name="Settings_ReportIssue" xml:space="preserve"><value>Sorun bildir</value></data>
+  <data name="Settings_License" xml:space="preserve"><value>MIT lisansıyla açık kaynak.</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
+  <data name="Settings_Checking" xml:space="preserve"><value>Denetleniyor…</value></data>
+  <data name="Settings_UpToDate" xml:space="preserve"><value>En son sürümü kullanıyorsunuz.</value></data>
+  <data name="Settings_UpdateReady" xml:space="preserve"><value>{0} sürümü hazır: güncellemek için yeniden başlatın.</value></data>
+  <data name="Settings_NotInstalled" xml:space="preserve"><value>Güncellemeler kurulu uygulamada çalışır; bu kopya bir derleme klasöründen çalışıyor.</value></data>
+  <data name="Settings_UpdateFailed" xml:space="preserve"><value>Güncellemeler denetlenemedi: {0}</value></data>
+</root>

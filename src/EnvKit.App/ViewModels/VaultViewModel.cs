@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.Profiles;
 using EnvKit.Core.Vault;
 using Wpf.Ui.Controls;
@@ -13,7 +14,7 @@ public sealed partial class VaultViewModel : PageViewModel
     private readonly MainViewModel _main;
 
     public VaultViewModel(AppServices services, MainViewModel main)
-        : base("Vault", SymbolRegular.LockClosed24)
+        : base("Page_Vault", SymbolRegular.LockClosed24)
     {
         _services = services;
         _main = main;
@@ -46,9 +47,9 @@ public sealed partial class VaultViewModel : PageViewModel
 
     public bool IsNew => Selected is null;
 
-    public string ValueLabel => IsNew ? "Value" : "New value (replaces the stored one)";
+    public string ValueLabel => Loc.Get(IsNew ? "Vault_ValueNew" : "Vault_ValueEdit");
 
-    public string DeleteLabel => IsDeleteArmed ? "Click again to delete" : "Delete";
+    public string DeleteLabel => Loc.Get(IsDeleteArmed ? "Vault_DeleteConfirm" : "Common_Delete");
 
     public string Reference => Selected is null ? string.Empty : VaultReference.For(Selected);
 
@@ -65,7 +66,7 @@ public sealed partial class VaultViewModel : PageViewModel
                 .Where(p => p.Actions.OfType<SetVariableAction>().Any(a => VaultReference.Names(a.Value).Contains(Selected, VaultNames.Comparer)))
                 .Select(p => p.Name)
                 .ToList();
-            return profiles.Count == 0 ? "Not used by any profile." : $"Used by: {string.Join(", ", profiles)}";
+            return profiles.Count == 0 ? Loc.Get("Vault_NotUsed") : Loc.Format("Vault_UsedBy", string.Join(", ", profiles));
         }
     }
 
@@ -106,7 +107,7 @@ public sealed partial class VaultViewModel : PageViewModel
         var name = EditName.Trim();
         if (IsNew && _services.Vault.Get(name) is not null)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Name taken", $"The vault already has '{name}'; select it to replace its value.");
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Vault_NameTaken"), Loc.Format("Vault_NameTakenMessage", name));
             return;
         }
 
@@ -114,7 +115,7 @@ public sealed partial class VaultViewModel : PageViewModel
         EditValue = string.Empty;
         Refresh();
         Selected = Names.FirstOrDefault(n => VaultNames.Comparer.Equals(n, name));
-        _main.ShowStatus(InfoBarSeverity.Success, "Secret stored", $"Reference it as {VaultReference.For(name)} in a profile.");
+        _main.ShowStatus(InfoBarSeverity.Success, Loc.Get("Vault_Stored"), Loc.Format("Vault_StoredMessage", VaultReference.For(name)));
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
@@ -130,6 +131,6 @@ public sealed partial class VaultViewModel : PageViewModel
         _services.Vault.Delete(name);
         Selected = null;
         Refresh();
-        _main.ShowStatus(InfoBarSeverity.Informational, "Secret deleted", $"Deleted '{name}'.");
+        _main.ShowStatus(InfoBarSeverity.Informational, Loc.Get("Vault_Deleted"), Loc.Format("Vault_DeletedMessage", name));
     }
 }

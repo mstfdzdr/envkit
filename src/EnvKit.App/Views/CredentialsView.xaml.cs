@@ -13,7 +13,7 @@ public partial class CredentialsView : UserControl
     {
         var dialog = new SaveFileDialog
         {
-            Title = "Export credential inventory (no secrets)",
+            Title = Localization.Loc.Get("Creds_ExportDialog"),
             FileName = "credentials.json",
             Filter = "JSON (*.json)|*.json",
         };

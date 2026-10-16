@@ -13,7 +13,7 @@ public partial class ProjectSecretsView : UserControl
 
     private void OnBrowse(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFolderDialog { Title = "Folder to scan for .env files and user secrets" };
+        var dialog = new OpenFolderDialog { Title = Localization.Loc.Get("Proj_BrowseTitle") };
         if (dialog.ShowDialog(Window.GetWindow(this)) == true)
         {
             ViewModel.Folder = dialog.FolderName;

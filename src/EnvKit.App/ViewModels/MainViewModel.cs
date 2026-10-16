@@ -1,20 +1,28 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core;
 using EnvKit.Core.Plans;
 using Wpf.Ui.Controls;
 
 namespace EnvKit.App.ViewModels;
 
-public abstract partial class PageViewModel(string title, SymbolRegular icon) : ObservableObject
+/// <param name="titleKey">Resource key of the navigation title.</param>
+public abstract partial class PageViewModel(string titleKey, SymbolRegular icon) : ObservableObject
 {
-    public string Title { get; } = title;
+    public string Title => Loc.Get(titleKey);
 
     public SymbolRegular Icon { get; } = icon;
 
     /// <summary>Reloads from the store, discarding unsaved edits.</summary>
     public abstract void Refresh();
+
+    /// <summary>
+    /// Re-renders texts in the new language. Pages override this to rebuild computed texts
+    /// without reloading, so unsaved edits survive a language switch.
+    /// </summary>
+    public virtual void OnLanguageChanged() => OnPropertyChanged(string.Empty);
 }
 
 public sealed partial class MainViewModel : ObservableObject
@@ -31,8 +39,10 @@ public sealed partial class MainViewModel : ObservableObject
         Vault = new VaultViewModel(services, this);
         ProjectSecrets = new ProjectSecretsViewModel(services, this);
         History = new HistoryViewModel(services, this);
-        Pages = [Path, Variables, Credentials, Profiles, Vault, ProjectSecrets, History];
+        Settings = new SettingsViewModel(services, this);
+        Pages = [Path, Variables, Credentials, Profiles, Vault, ProjectSecrets, History, Settings];
         SelectedPage = Path;
+        Loc.Instance.CultureChanged += (_, _) => OnLanguageChanged();
     }
 
     public VariablesViewModel Variables { get; }
@@ -48,6 +58,8 @@ public sealed partial class MainViewModel : ObservableObject
     public ProjectSecretsViewModel ProjectSecrets { get; }
 
     public HistoryViewModel History { get; }
+
+    public SettingsViewModel Settings { get; }
 
     public IReadOnlyList<PageViewModel> Pages { get; }
 
@@ -75,7 +87,7 @@ public sealed partial class MainViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(UpdateLabel))]
     public partial string? PendingUpdate { get; set; }
 
-    public string UpdateLabel => $"Restart to update to {PendingUpdate}";
+    public string UpdateLabel => Loc.Format("Main_UpdateLabel", PendingUpdate);
 
     /// <summary>Best effort: offline or rate-limited simply means no update this time.</summary>
     public async Task CheckForUpdatesAsync()
@@ -105,7 +117,7 @@ public sealed partial class MainViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(plan);
         if (plan.IsEmpty)
         {
-            ShowStatus(InfoBarSeverity.Informational, "Nothing to change", "The edits match what is already stored.");
+            ShowStatus(InfoBarSeverity.Informational, Loc.Get("Status_NothingToChange"), Loc.Get("Status_NothingToChangeMessage"));
             return;
         }
 
@@ -128,7 +140,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException)
         {
-            ShowStatus(InfoBarSeverity.Error, "Nothing was changed", ex.Message);
+            ShowStatus(InfoBarSeverity.Error, Loc.Get("Status_NothingChanged"), ex.Message);
             Review = null;
             return;
         }
@@ -137,33 +149,33 @@ public sealed partial class MainViewModel : ObservableObject
         {
             // The UAC prompt and the broadcast both block; keep the UI thread free.
             var result = await Task.Run(() => _services.Executor().Execute(plan));
-            var propagation = plan.Changes.Any(c => c is VariableChange)
-                ? " New terminals see the change, open ones keep their old environment."
-                : string.Empty;
-            ShowStatus(
-                InfoBarSeverity.Success,
-                "Changes applied",
-                $"Snapshot {result.Snapshot!.Id} saved; restore it from History.{propagation}");
+            var message = Loc.Format("Status_AppliedMessage", result.Snapshot!.Id);
+            if (plan.Changes.Any(c => c is VariableChange))
+            {
+                message += " " + Loc.Get("Status_Propagation");
+            }
+
+            ShowStatus(InfoBarSeverity.Success, Loc.Get("Status_Applied"), message);
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
-            ShowStatus(InfoBarSeverity.Warning, "Cancelled", ex.Message);
+            ShowStatus(InfoBarSeverity.Warning, Loc.Get("Status_Cancelled"), Loc.Get("Status_ElevationDeclined"));
         }
         catch (ElevationRequiredException)
         {
-            ShowStatus(InfoBarSeverity.Error, "Administrator rights needed", "Machine-scope changes need administrator rights. Nothing was changed.");
+            ShowStatus(InfoBarSeverity.Error, Loc.Get("Status_AdminNeeded"), Loc.Get("Status_AdminNeededMessage"));
         }
         catch (ElevatedApplyException ex)
         {
-            ShowStatus(InfoBarSeverity.Error, "Machine changes failed", $"{ex.Message} User-scope changes from this plan were reverted.");
+            ShowStatus(InfoBarSeverity.Error, Loc.Get("Status_MachineFailed"), Loc.Format("Status_MachineFailedMessage", ex.Message));
         }
         catch (PlanConflictException ex)
         {
-            ShowStatus(InfoBarSeverity.Warning, "Changed elsewhere", $"{ex.Message} The view was reloaded; make the edit again.");
+            ShowStatus(InfoBarSeverity.Warning, Loc.Get("Status_Conflict"), Loc.Format("Status_ConflictMessage", ex.Message));
         }
         catch (PlanApplyException ex)
         {
-            ShowStatus(InfoBarSeverity.Error, "Partially applied", ex.Message);
+            ShowStatus(InfoBarSeverity.Error, Loc.Get("Status_Partial"), ex.Message);
         }
         finally
         {
@@ -178,5 +190,15 @@ public sealed partial class MainViewModel : ObservableObject
         {
             page.Refresh();
         }
+    }
+
+    private void OnLanguageChanged()
+    {
+        foreach (var page in Pages)
+        {
+            page.OnLanguageChanged();
+        }
+
+        OnPropertyChanged(nameof(UpdateLabel));
     }
 }

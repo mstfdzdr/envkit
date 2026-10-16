@@ -122,6 +122,16 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
 - **Kasa:** `envkit dotenv link KEY NAME --move` değeri kasaya taşır, dosyada `${vault:NAME}` bırakır; kasa yazması onaydan sonra, dosya değişmeden hemen önce yapılır. `envkit run --env-file` değerleri yükler ve referansları çözer (sıra: ortam → profiller → env dosyaları → `--secret`).
 - **Maskeleme:** kullanıcı adı/parola içeren URL'ler (`postgres://u:p@host`) ve `*_DSN` anahtarları da secret sayılır. Grid satırlarının UI Automation adı satır nesnesinin `ToString()`'inden gelir; satırlar ve `EnvVariable` bu yüzden yalnızca adı yazdırır (record varsayılanı değeri de yazıyordu).
 
+## Dil, tema ve ayarlar — uygulanan kararlar
+
+- **Diller:** İngilizce ve Türkçe. Varsayılan "Windows dilini kullan" (Windows Türkçeyse Türkçe, değilse İngilizce). Ayarlar'dan değiştirilir, yeniden başlatma gerekmez: XAML metinleri `{l:Tr Anahtar}` ile `Loc.Instance` indexer'ına bağlıdır; dil değişince bağlamalar yenilenir, sayfalar kaydedilmemiş düzenlemeleri kaybetmeden metinlerini yeniden üretir.
+- **Kaynaklar:** `.resx` (standart, çevirmen araçlarıyla uyumlu). Tek kaynak `Strings.txt` / `CoreStrings.txt` tablosudur (anahtar, İngilizce, Türkçe); `build/New-Resx.ps1` iki `.resx`'i üretir, böylece diller birbirinden kopamaz. Bir test, kod ve XAML'de kullanılan her anahtarın iki dilde de var olduğunu doğrular.
+- **Core metinleri** (plan özetleri, PATH sorunları, kapsam adları) `CoreText` üzerinden gelir; kültürü açıkça ayarlanır. CLI ve testler İngilizceye sabittir (script çıktısı ve test beklentileri makinenin diline bağlı olmasın), uygulama seçilen dili kullanır.
+- **Tema:** Windows ayarı (değişiklikleri de izler), Açık veya Koyu; WPF-UI `ApplicationThemeManager` + `SystemThemeWatcher`.
+- **Ayarlar** `%LOCALAPPDATA%\EnvKit.Data\settings.json`; dosya yoksa veya bozuksa varsayılanlar kullanılır.
+- **Hakkında:** sürüm, GitHub profili, repo ve sorun bildirme linkleri, "Güncellemeleri denetle".
+- **İkon:** `build/IconGen` vektörden 16–256 px PNG kareleri ve `.ico` üretir (`src/EnvKit.App/Assets`); exe, pencere başlığı ve Setup.exe bu ikonu kullanır.
+
 ## Veri modeli (özet)
 
 - `EnvVariable { Name, Value, Scope(User|Machine), Kind(Literal|Expandable) }`

@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             xmlns:l="clr-namespace:EnvKit.App.Localization"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:VariablesViewModel}">
   <Grid>
@@ -18,17 +19,17 @@
       <ColumnDefinition Width="380" />
     </Grid.ColumnDefinitions>
 
-    <TextBlock Grid.Row="0" Text="Variables" Style="{StaticResource PageTitle}" />
+    <TextBlock Grid.Row="0" Text="{l:Tr Page_Variables}" Style="{StaticResource PageTitle}" />
 
     <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,12">
       <ComboBox DockPanel.Dock="Left" MinWidth="140" ItemsSource="{Binding Scopes}" SelectedItem="{Binding Scope}"
-                AutomationProperties.Name="Scope" />
-      <ui:Button DockPanel.Dock="Right" Content="New" Icon="{ui:SymbolIcon Add24}" Command="{Binding NewCommand}" Margin="8,0,0,0" />
-      <ui:ToggleSwitch DockPanel.Dock="Right" Margin="12,0,4,0" Content="Show secret values"
+                ItemTemplate="{StaticResource EnumItem}" AutomationProperties.Name="{l:Tr Common_Scope}" />
+      <ui:Button DockPanel.Dock="Right" Content="{l:Tr Common_New}" Icon="{ui:SymbolIcon Add24}" Command="{Binding NewCommand}" Margin="8,0,0,0" />
+      <ui:ToggleSwitch DockPanel.Dock="Right" Margin="12,0,4,0" Content="{l:Tr Common_ShowSecrets}"
                        IsChecked="{Binding RevealSecrets}" />
       <ui:TextBox Margin="8,0,0,0" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
-                  PlaceholderText="Search names and values" Icon="{ui:SymbolIcon Search24}"
-                  AutomationProperties.Name="Search" />
+                  PlaceholderText="{l:Tr Vars_SearchPlaceholder}" Icon="{ui:SymbolIcon Search24}"
+                  AutomationProperties.Name="{l:Tr Common_Search}" />
     </DockPanel>
 
     <DataGrid Grid.Row="2"
@@ -40,11 +41,11 @@
               SelectionMode="Single"
               HeadersVisibility="Column"
               GridLinesVisibility="None"
-              AutomationProperties.Name="Variables">
+              AutomationProperties.Name="{l:Tr Page_Variables}">
       <DataGrid.Columns>
-        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="220" />
-        <DataGridTextColumn Header="Value" Binding="{Binding DisplayValue}" Width="*" />
-        <DataGridTextColumn Header="Kind" Binding="{Binding Kind}" Width="100" />
+        <DataGridTextColumn Header="{l:Tr Common_Name}" Binding="{Binding Name}" Width="220" />
+        <DataGridTextColumn Header="{l:Tr Common_Value}" Binding="{Binding DisplayValue}" Width="*" />
+        <DataGridTextColumn Header="{l:Tr Vars_Kind}" Binding="{Binding Kind, Converter={StaticResource EnumText}}" Width="120" />
       </DataGrid.Columns>
     </DataGrid>
 
@@ -52,14 +53,14 @@
       <StackPanel>
         <TextBlock Text="{Binding EditorTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
 
-        <TextBlock Text="Name" Margin="0,0,0,4" />
+        <TextBlock Text="{l:Tr Common_Name}" Margin="0,0,0,4" />
         <ui:TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsNew}"
-                    AutomationProperties.Name="Name" />
+                    AutomationProperties.Name="{l:Tr Common_Name}" />
 
-        <TextBlock Text="Value" Margin="0,12,0,4" />
+        <TextBlock Text="{l:Tr Common_Value}" Margin="0,12,0,4" />
         <ui:TextBox Text="{Binding EditValue, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"
                     MinHeight="96" MaxHeight="260" VerticalScrollBarVisibility="Auto"
-                    FontFamily="Cascadia Mono, Consolas" AutomationProperties.Name="Value">
+                    FontFamily="Cascadia Mono, Consolas" AutomationProperties.Name="{l:Tr Common_Value}">
           <ui:TextBox.Style>
             <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
               <Style.Triggers>
@@ -72,18 +73,18 @@
         </ui:TextBox>
         <ui:Card Visibility="{Binding IsValueHidden, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Style="{StaticResource Muted}"
-                     Text="This looks like a secret, so it is hidden. Turn on 'Show secret values' to view or edit it." />
+                     Text="{l:Tr Vars_Hidden}" />
         </ui:Card>
 
         <!-- Double underscores: a single one would be taken as an access key marker. -->
         <CheckBox Margin="0,12,0,0" IsChecked="{Binding EditExpandable}"
-                  Content="Expand %VARIABLES% (REG__EXPAND__SZ)" />
+                  Content="{l:Tr Vars_Expand}" />
         <TextBlock Margin="0,8,0,0" Text="{Binding Preview}" Style="{StaticResource Muted}" />
 
         <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-          <ui:Button Content="Review &amp; save" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
+          <ui:Button Content="{l:Tr Common_ReviewSave}" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
                      Command="{Binding SaveCommand}" Margin="0,0,8,0" />
-          <ui:Button Content="Delete" Appearance="Danger" Icon="{ui:SymbolIcon Delete24}" Command="{Binding DeleteCommand}" />
+          <ui:Button Content="{l:Tr Common_Delete}" Appearance="Danger" Icon="{ui:SymbolIcon Delete24}" Command="{Binding DeleteCommand}" />
         </StackPanel>
       </StackPanel>
     </ui:Card>

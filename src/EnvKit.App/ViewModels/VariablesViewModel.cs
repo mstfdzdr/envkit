@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.Security;
 using EnvKit.Core.Variables;
 using Wpf.Ui.Controls;
@@ -25,7 +26,7 @@ public sealed partial class VariablesViewModel : PageViewModel
     private readonly MainViewModel _main;
 
     public VariablesViewModel(AppServices services, MainViewModel main)
-        : base("Variables", SymbolRegular.BracesVariable24)
+        : base("Page_Variables", SymbolRegular.BracesVariable24)
     {
         _services = services;
         _main = main;
@@ -68,7 +69,7 @@ public sealed partial class VariablesViewModel : PageViewModel
     [NotifyPropertyChangedFor(nameof(Preview))]
     public partial bool EditExpandable { get; set; }
 
-    public string EditorTitle => IsNew ? "New variable" : "Edit variable";
+    public string EditorTitle => Loc.Get(IsNew ? "Vars_NewTitle" : "Vars_EditTitle");
 
     /// <summary>A masked variable cannot be viewed or edited until secrets are revealed.</summary>
     public bool IsValueHidden => Selected is { IsSecret: true } && !RevealSecrets;
@@ -84,7 +85,7 @@ public sealed partial class VariablesViewModel : PageViewModel
             }
 
             var expanded = _services.Lookup().Expand(EditValue, Scope).Value;
-            return expanded == EditValue ? string.Empty : $"Expands to: {expanded}";
+            return expanded == EditValue ? string.Empty : Loc.Format("Vars_ExpandsTo", expanded);
         }
     }
 
@@ -144,18 +145,18 @@ public sealed partial class VariablesViewModel : PageViewModel
         {
             var kind = EditExpandable ? EnvValueKind.Expandable : EnvValueKind.Literal;
             var name = EditName.Trim();
-            var plan = _services.NewPlan().Set(name, Scope, EditValue, kind).Build($@"Set {Scope}\{name}");
+            var plan = _services.NewPlan().Set(name, Scope, EditValue, kind).Build(Loc.Format("Vars_SetDescription", EnumTextConverter.Text(Scope), name));
             _main.RequestReview(plan);
         }
         catch (ArgumentException ex)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Invalid variable", ex.Message);
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Vars_Invalid"), ex.Message);
         }
     }
 
     [RelayCommand(CanExecute = nameof(CanDelete))]
     private void Delete() =>
-        _main.RequestReview(_services.NewPlan().Delete(Selected!.Name, Scope).Build($@"Delete {Scope}\{Selected.Name}"));
+        _main.RequestReview(_services.NewPlan().Delete(Selected!.Name, Scope).Build(Loc.Format("Vars_DeleteDescription", EnumTextConverter.Text(Scope), Selected.Name)));
 
     private bool CanDelete() => Selected is not null;
 

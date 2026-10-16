@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             xmlns:l="clr-namespace:EnvKit.App.Localization"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:PathViewModel}">
   <Grid>
@@ -16,21 +17,21 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
-    <TextBlock Grid.Row="0" Text="PATH" Style="{StaticResource PageTitle}" />
+    <TextBlock Grid.Row="0" Text="{l:Tr Page_Path}" Style="{StaticResource PageTitle}" />
 
     <DockPanel Grid.Row="1" Margin="0,0,0,12" LastChildFill="False">
       <ComboBox DockPanel.Dock="Left" MinWidth="140" ItemsSource="{Binding Scopes}" SelectedItem="{Binding Scope}"
-                AutomationProperties.Name="Scope" />
+                ItemTemplate="{StaticResource EnumItem}" AutomationProperties.Name="{l:Tr Common_Scope}" />
       <TextBlock DockPanel.Dock="Left" Margin="16,0,0,0" VerticalAlignment="Center" Text="{Binding Summary}"
                  Style="{StaticResource Muted}" />
-      <ui:Button DockPanel.Dock="Right" Content="Review &amp; save" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
+      <ui:Button DockPanel.Dock="Right" Content="{l:Tr Common_ReviewSave}" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
                  Command="{Binding SaveCommand}" Margin="8,0,0,0" />
-      <ui:Button DockPanel.Dock="Right" Content="Revert" Icon="{ui:SymbolIcon ArrowUndo24}"
+      <ui:Button DockPanel.Dock="Right" Content="{l:Tr Common_Revert}" Icon="{ui:SymbolIcon ArrowUndo24}"
                  Command="{Binding RevertCommand}" Margin="8,0,0,0" />
-      <ui:Button DockPanel.Dock="Right" Content="Remove missing" Icon="{ui:SymbolIcon Delete24}"
+      <ui:Button DockPanel.Dock="Right" Content="{l:Tr Path_RemoveMissing}" Icon="{ui:SymbolIcon Delete24}"
                  Command="{Binding RemoveMissingCommand}" Margin="8,0,0,0"
-                 ToolTip="Remove directories that do not exist. Check removable and network drives first." />
-      <ui:Button DockPanel.Dock="Right" Content="Fix empty &amp; duplicates" Icon="{ui:SymbolIcon Wrench24}"
+                 ToolTip="{l:Tr Path_RemoveMissingTip}" />
+      <ui:Button DockPanel.Dock="Right" Content="{l:Tr Path_Fix}" Icon="{ui:SymbolIcon Wrench24}"
                  Command="{Binding FixProblemsCommand}" />
     </DockPanel>
 
@@ -43,7 +44,7 @@
              PreviewMouseMove="OnEntryMouseMove"
              Drop="OnEntryDrop"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-             AutomationProperties.Name="PATH entries">
+             AutomationProperties.Name="{l:Tr Path_Entries}">
       <ListBox.ItemContainerStyle>
         <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
           <Setter Property="Padding" Value="8,3" />
@@ -77,17 +78,17 @@
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
       <ui:TextBox Grid.Column="0" Text="{Binding NewEntry, UpdateSourceTrigger=PropertyChanged}"
-                  PlaceholderText="Directory, e.g. %USERPROFILE%\bin" FontFamily="Cascadia Mono, Consolas"
-                  AutomationProperties.Name="Directory" />
+                  PlaceholderText="{l:Tr Path_DirectoryPlaceholder}" FontFamily="Cascadia Mono, Consolas"
+                  AutomationProperties.Name="{l:Tr Path_Directory}" />
       <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
-        <ui:Button Content="Browse…" Icon="{ui:SymbolIcon FolderOpen24}" Click="OnBrowse" Margin="0,0,8,0" />
-        <ui:Button Content="Add" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddCommand}" Margin="0,0,8,0" />
-        <ui:Button Content="Replace" Icon="{ui:SymbolIcon Edit24}" Command="{Binding ReplaceCommand}" Margin="0,0,8,0" />
-        <ui:Button Icon="{ui:SymbolIcon ArrowUp24}" Command="{Binding MoveUpCommand}" ToolTip="Move up" Margin="0,0,8,0"
-                   AutomationProperties.Name="Move up" />
-        <ui:Button Icon="{ui:SymbolIcon ArrowDown24}" Command="{Binding MoveDownCommand}" ToolTip="Move down" Margin="0,0,8,0"
-                   AutomationProperties.Name="Move down" />
-        <ui:Button Content="Remove" Icon="{ui:SymbolIcon Delete24}" Appearance="Danger" Command="{Binding RemoveCommand}" />
+        <ui:Button Content="{l:Tr Common_Browse}" Icon="{ui:SymbolIcon FolderOpen24}" Click="OnBrowse" Margin="0,0,8,0" />
+        <ui:Button Content="{l:Tr Common_Add}" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddCommand}" Margin="0,0,8,0" />
+        <ui:Button Content="{l:Tr Path_Replace}" Icon="{ui:SymbolIcon Edit24}" Command="{Binding ReplaceCommand}" Margin="0,0,8,0" />
+        <ui:Button Icon="{ui:SymbolIcon ArrowUp24}" Command="{Binding MoveUpCommand}" ToolTip="{l:Tr Common_MoveUp}" Margin="0,0,8,0"
+                   AutomationProperties.Name="{l:Tr Common_MoveUp}" />
+        <ui:Button Icon="{ui:SymbolIcon ArrowDown24}" Command="{Binding MoveDownCommand}" ToolTip="{l:Tr Common_MoveDown}" Margin="0,0,8,0"
+                   AutomationProperties.Name="{l:Tr Common_MoveDown}" />
+        <ui:Button Content="{l:Tr Common_Remove}" Icon="{ui:SymbolIcon Delete24}" Appearance="Danger" Command="{Binding RemoveCommand}" />
       </StackPanel>
     </Grid>
 
@@ -102,12 +103,12 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <ui:TextBox Grid.Column="0" Text="{Binding WhichQuery, UpdateSourceTrigger=PropertyChanged}"
-                  PlaceholderText="Which command runs? e.g. python" AutomationProperties.Name="Command name">
+                  PlaceholderText="{l:Tr Path_WhichPlaceholder}" AutomationProperties.Name="{l:Tr Path_CommandName}">
         <ui:TextBox.InputBindings>
           <KeyBinding Key="Enter" Command="{Binding WhichCommand}" />
         </ui:TextBox.InputBindings>
       </ui:TextBox>
-      <ui:Button Grid.Column="1" Content="Find" Icon="{ui:SymbolIcon Search24}" Command="{Binding WhichCommand}" Margin="8,0,0,0" />
+      <ui:Button Grid.Column="1" Content="{l:Tr Common_Find}" Icon="{ui:SymbolIcon Search24}" Command="{Binding WhichCommand}" Margin="8,0,0,0" />
       <ItemsControl Grid.Row="1" Grid.ColumnSpan="3" Margin="0,8,0,0" ItemsSource="{Binding WhichResults}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>

@@ -1,0 +1,279 @@
+# key	English	Türkçe
+# Generates Strings.resx and Strings.tr.resx: ./build/New-Resx.ps1 -Table src/EnvKit.App/Resources/Strings.txt -Output src/EnvKit.App/Resources/Strings
+
+# Common
+Common_ReviewSave	Review & save	İncele ve kaydet
+Common_New	New	Yeni
+Common_Delete	Delete	Sil
+Common_Save	Save	Kaydet
+Common_Browse	Browse…	Gözat…
+Common_Add	Add	Ekle
+Common_Remove	Remove	Kaldır
+Common_Revert	Revert	Geri döndür
+Common_MoveUp	Move up	Yukarı taşı
+Common_MoveDown	Move down	Aşağı taşı
+Common_Copy	Copy	Kopyala
+Common_Search	Search	Ara
+Common_Name	Name	Ad
+Common_Value	Value	Değer
+Common_Scope	Scope	Kapsam
+Common_Key	Key	Anahtar
+Common_Comment	Comment	Yorum
+Common_Description	Description	Açıklama
+Common_Find	Find	Bul
+Common_ShowSecrets	Show secret values	Gizli değerleri göster
+Common_Cancel	Cancel	Vazgeç
+Common_Apply	Apply	Uygula
+Common_Empty	(empty)	(boş)
+
+# Pages
+Page_Path	PATH	PATH
+Page_Variables	Variables	Değişkenler
+Page_Credentials	Credentials	Kimlik bilgileri
+Page_Profiles	Profiles	Profiller
+Page_Vault	Vault	Kasa
+Page_ProjectSecrets	Project secrets	Proje gizlileri
+Page_History	History	Geçmiş
+Page_Settings	Settings	Ayarlar
+
+# Enum values
+Enum_EnvScope_User	User	Kullanıcı
+Enum_EnvScope_Machine	Machine	Sistem
+Enum_EnvValueKind_Literal	Literal	Düz metin
+Enum_EnvValueKind_Expandable	Expandable	Genişletilebilir
+Enum_CredentialPersistence_LocalMachine	This computer	Bu bilgisayar
+Enum_CredentialPersistence_Enterprise	Roaming	Dolaşımlı
+Enum_CredentialPersistence_Session	This session	Bu oturum
+Enum_CredentialKind_DomainPassword	Domain password	Etki alanı parolası
+Enum_CredentialKind_DomainCertificate	Domain certificate	Etki alanı sertifikası
+Enum_CredentialKind_DomainVisiblePassword	Domain password (visible)	Etki alanı parolası (görünür)
+Enum_CredentialKind_GenericCertificate	Certificate	Sertifika
+Enum_CredentialKind_DomainExtended	Domain (extended)	Etki alanı (genişletilmiş)
+Enum_CredentialGroup_Git	Git	Git
+Enum_CredentialGroup_GitHubDesktop	GitHub Desktop	GitHub Desktop
+Enum_CredentialGroup_VisualStudio	Visual Studio	Visual Studio
+Enum_CredentialGroup_VSCode	VS Code	VS Code
+Enum_CredentialGroup_Docker	Docker	Docker
+Enum_CredentialGroup_RemoteDesktop	Remote Desktop	Uzak Masaüstü
+Enum_CredentialGroup_MicrosoftAccount	Microsoft account	Microsoft hesabı
+Enum_CredentialGroup_Office	Office	Office
+Enum_CredentialGroup_Network	Network	Ağ
+Enum_CredentialGroup_Other	Other	Diğer
+Enum_ActionKind_Set	Set	Ayarla
+Enum_ActionKind_Unset	Unset	Kaldır
+Enum_ActionKind_PrependPath	PATH: prepend	PATH: başa ekle
+Enum_ActionKind_AppendPath	PATH: append	PATH: sona ekle
+Enum_ActionKind_RemovePath	PATH: remove	PATH: çıkar
+Enum_ThemeChoice_System	Use Windows setting	Windows ayarını kullan
+Enum_ThemeChoice_Light	Light	Açık
+Enum_ThemeChoice_Dark	Dark	Koyu
+Enum_LanguageChoice_System	Use Windows language	Windows dilini kullan
+Enum_LanguageChoice_English	English	English
+Enum_LanguageChoice_Turkish	Türkçe	Türkçe
+
+# Main window, review overlay, status messages
+Main_Navigation	Navigation	Gezinme
+Main_UpdateLabel	Restart to update to {0}	{0} için yeniden başlat
+Review_Title	Review changes	Değişiklikleri incele
+Review_Elevation	Includes machine-scope changes: Windows will ask for administrator approval.	Sistem kapsamında değişiklik içeriyor: Windows yönetici onayı isteyecek.
+Review_Irreversible	Some deletions cannot be undone: Windows never reveals the secret of domain credentials.	Bazı silmeler geri alınamaz: Windows etki alanı kimlik bilgilerinin gizli bilgisini hiçbir zaman vermez.
+Status_NothingToChange	Nothing to change	Değişecek bir şey yok
+Status_NothingToChangeMessage	The edits match what is already stored.	Düzenlemeler kayıtlı olanla aynı.
+Status_NothingChanged	Nothing was changed	Hiçbir şey değiştirilmedi
+Status_Applied	Changes applied	Değişiklikler uygulandı
+Status_AppliedMessage	Snapshot {0} saved; restore it from History.	{0} anlık görüntüsü kaydedildi; Geçmiş'ten geri yükleyebilirsiniz.
+Status_Propagation	New terminals see the change, open ones keep their old environment.	Yeni açılan terminaller değişikliği görür, açık olanlar eski ortamla devam eder.
+Status_Cancelled	Cancelled	İptal edildi
+Status_ElevationDeclined	The administrator prompt was declined; nothing was changed.	Yönetici onayı verilmedi; hiçbir şey değiştirilmedi.
+Status_AdminNeeded	Administrator rights needed	Yönetici yetkisi gerekli
+Status_AdminNeededMessage	Machine-scope changes need administrator rights. Nothing was changed.	Sistem kapsamındaki değişiklikler yönetici yetkisi gerektirir. Hiçbir şey değiştirilmedi.
+Status_MachineFailed	Machine changes failed	Sistem değişiklikleri başarısız oldu
+Status_MachineFailedMessage	{0} User-scope changes from this plan were reverted.	{0} Bu plandaki kullanıcı kapsamı değişiklikleri geri alındı.
+Status_Conflict	Changed elsewhere	Başka bir yerde değiştirildi
+Status_ConflictMessage	{0} The view was reloaded; make the edit again.	{0} Görünüm yeniden yüklendi; düzenlemeyi tekrar yapın.
+Status_Partial	Partially applied	Kısmen uygulandı
+
+# PATH
+Path_Fix	Fix empty & duplicates	Boş ve tekrarları düzelt
+Path_RemoveMissing	Remove missing	Olmayanları kaldır
+Path_RemoveMissingTip	Remove directories that do not exist. Check removable and network drives first.	Var olmayan klasörleri kaldırır. Önce çıkarılabilir ve ağ sürücülerini kontrol edin.
+Path_Entries	PATH entries	PATH girdileri
+Path_Directory	Directory	Klasör
+Path_DirectoryPlaceholder	Directory, e.g. %USERPROFILE%\bin	Klasör, örn. %USERPROFILE%\bin
+Path_Replace	Replace	Değiştir
+Path_WhichPlaceholder	Which command runs? e.g. python	Hangi komut çalışır? örn. python
+Path_CommandName	Command name	Komut adı
+Path_Summary	{0} entries · {1}	{0} girdi · {1}
+Path_NoProblems	no problems	sorun yok
+Path_Problems	{0} problem(s)	{0} sorun
+Path_UpdateDescription	Update PATH	PATH'i güncelle
+Path_BrowseTitle	Add to PATH	PATH'e ekle
+Which_StoreAlias	Store alias	Store kısayolu
+Which_Shadowed	shadowed	gölgede kalıyor
+Which_NotFound	{0}: not found in PATH	{0}: PATH'te bulunamadı
+
+# Variables
+Vars_SearchPlaceholder	Search names and values	Ad ve değerlerde ara
+Vars_Kind	Kind	Tür
+Vars_NewTitle	New variable	Yeni değişken
+Vars_EditTitle	Edit variable	Değişkeni düzenle
+Vars_Hidden	This looks like a secret, so it is hidden. Turn on 'Show secret values' to view or edit it.	Bu bir gizli bilgiye benziyor, bu yüzden gizlendi. Görmek veya düzenlemek için 'Gizli değerleri göster'i açın.
+Vars_Expand	Expand %VARIABLES% (REG__EXPAND__SZ)	%DEĞİŞKENLER%'i genişlet (REG__EXPAND__SZ)
+Vars_ExpandsTo	Expands to: {0}	Genişletilmiş hali: {0}
+Vars_Invalid	Invalid variable	Geçersiz değişken
+Vars_SetDescription	Set {0}\{1}	{0}\{1} ayarla
+Vars_DeleteDescription	Delete {0}\{1}	{0}\{1} sil
+
+# Credentials
+Creds_Tool	Tool	Araç
+Creds_SearchPlaceholder	Search targets and user names	Hedef ve kullanıcı adlarında ara
+Creds_SelectForDelete	Select for delete	Silmek için seç
+Creds_Target	Target	Hedef
+Creds_User	User	Kullanıcı
+Creds_Type	Type	Tür
+Creds_Written	Written	Yazıldı
+Creds_DeleteTip	Deletes the ticked credentials, or the selected one. Undo from History.	İşaretli kimlik bilgilerini veya seçili olanı siler. Geçmiş'ten geri alınabilir.
+Creds_Export	Export inventory…	Envanteri dışa aktar…
+Creds_ExportTip	Writes targets, users and dates as JSON. No secrets are included.	Hedefleri, kullanıcıları ve tarihleri JSON olarak yazar. Gizli bilgi içermez.
+Creds_ExportDialog	Export credential inventory (no secrets)	Kimlik bilgisi envanterini dışa aktar (gizli bilgi yok)
+Creds_ReadOnly	Windows keeps the secret of this domain credential to itself, so it can be deleted but not edited.	Windows bu etki alanı kimlik bilgisinin gizli bilgisini paylaşmaz; silinebilir ama düzenlenemez.
+Creds_UserName	User name	Kullanıcı adı
+Creds_ShowPassword	Show password	Parolayı göster
+Creds_StoredPassword	Stored password	Kayıtlı parola
+Creds_Persistence	Persistence	Kalıcılık
+Creds_All	All ({0})	Tümü ({0})
+Creds_GroupCount	{0} ({1})	{0} ({1})
+Creds_NewTitle	New credential	Yeni kimlik bilgisi
+Creds_EditTitle	Edit credential	Kimlik bilgisini düzenle
+Creds_PasswordNew	Password	Parola
+Creds_PasswordEdit	New password (leave empty to keep the current one)	Yeni parola (mevcut parolayı korumak için boş bırakın)
+Creds_Shown	{0} shown	{0} gösteriliyor
+Creds_Delete	Delete…	Sil…
+Creds_DeleteMany	Delete {0}…	{0} tanesini sil…
+Creds_Invalid	Invalid credential	Geçersiz kimlik bilgisi
+Creds_SetDescription	Set credential {0}	{0} kimlik bilgisini ayarla
+Creds_DeleteDescription	Delete {0} credential(s)	{0} kimlik bilgisini sil
+Creds_Exported	Exported	Dışa aktarıldı
+Creds_ExportedMessage	{0} credential(s) written to {1}. No secrets are included.	{0} kimlik bilgisi {1} dosyasına yazıldı. Gizli bilgi içermez.
+
+# Profiles
+Profiles_New	New profile	Yeni profil
+Profiles_NamePlaceholder	e.g. java21	örn. java21
+Profiles_ProfileName	Profile name	Profil adı
+Profiles_Actions	Actions, applied in order	Eylemler (sırayla uygulanır)
+Profiles_AddAction	Add action	Eylem ekle
+Profiles_RemoveAction	Remove action	Eylemi kaldır
+Profiles_Action	Action	Eylem
+Profiles_Variable	Variable	Değişken
+Profiles_ValueOrDirectory	Value or directory	Değer veya klasör
+Profiles_Hint	Values may use %VARIABLES% (expanded in order, so %JAVA_HOME%\bin follows a JAVA_HOME set above) and ${vault:NAME} for vault secrets.	Değerlerde %DEĞİŞKENLER% (sırayla genişletilir; %JAVA_HOME%\bin yukarıda ayarlanan JAVA_HOME'u izler) ve kasadaki gizli bilgiler için ${vault:AD} kullanılabilir.
+Profiles_RunWith	Run with it:	Bununla çalıştır:
+Profiles_RunCommand	Run command	Çalıştırma komutu
+Profiles_SaveProfile	Save profile	Profili kaydet
+Profiles_Apply	Apply to my environment…	Ortamıma uygula…
+Profiles_ApplyTip	Writes the saved profile to the user environment after a review. Profiles using vault secrets can only be run.	Kayıtlı profili incelemeden sonra kullanıcı ortamına yazar. Kasa kullanan profiller yalnızca çalıştırılabilir.
+Profiles_Missing	Not in the vault yet: {0}	Henüz kasada değil: {0}
+Profiles_Invalid	Invalid profile	Geçersiz profil
+Profiles_NeedsAction	A profile needs at least one action.	Bir profilin en az bir eylemi olmalı.
+Profiles_NameTaken	Name taken	Ad kullanımda
+Profiles_NameTakenMessage	A profile named '{0}' already exists.	'{0}' adlı bir profil zaten var.
+Profiles_Saved	Profile saved	Profil kaydedildi
+Profiles_SavedMessage	Saved '{0}'. Nothing changes until you apply or run it.	'{0}' kaydedildi. Uygulayana veya çalıştırana kadar hiçbir şey değişmez.
+Profiles_RunOnly	Run only	Yalnızca çalıştırılabilir
+Profiles_RunOnlyMessage	'{0}' uses vault secrets, which EnvKit never writes to the persistent environment. Use it with: envkit run -p {0} -- <command>	'{0}' kasadaki gizli bilgileri kullanıyor; EnvKit bunları kalıcı ortama asla yazmaz. Şöyle kullanın: envkit run -p {0} -- <komut>
+Profiles_ApplyDescription	Apply profile {0}	{0} profilini uygula
+Profiles_Deleted	Profile deleted	Profil silindi
+Profiles_DeletedMessage	Deleted '{0}'. Changes it already applied stay; undo them from History.	'{0}' silindi. Daha önce uyguladığı değişiklikler duruyor; Geçmiş'ten geri alabilirsiniz.
+
+# Vault
+Vault_Intro	Secrets here are encrypted for your Windows account and only ever reach a process through envkit run. They are never written to the persistent environment.	Buradaki gizli bilgiler Windows hesabınız için şifrelenir ve bir process'e yalnızca envkit run ile ulaşır. Kalıcı ortama asla yazılmaz.
+Vault_New	New secret	Yeni gizli bilgi
+Vault_Secrets	Secrets	Gizli bilgiler
+Vault_NamePlaceholder	e.g. openai	örn. openai
+Vault_SecretName	Secret name	Gizli bilgi adı
+Vault_SecretValue	Secret value	Gizli değer
+Vault_ValueNew	Value	Değer
+Vault_ValueEdit	New value (replaces the stored one)	Yeni değer (kayıtlı olanın yerine geçer)
+Vault_Reference	Reference:	Referans:
+Vault_ShowValue	Show value	Değeri göster
+Vault_StoredValue	Stored value	Kayıtlı değer
+Vault_DeleteConfirm	Click again to delete	Silmek için tekrar tıklayın
+Vault_DeleteTip	Vault secrets are not snapshotted: deleting one cannot be undone.	Kasa gizli bilgileri anlık görüntüye alınmaz: silme geri alınamaz.
+Vault_UsedBy	Used by: {0}	Kullanan profiller: {0}
+Vault_NotUsed	Not used by any profile.	Hiçbir profil kullanmıyor.
+Vault_NameTaken	Name taken	Ad kullanımda
+Vault_NameTakenMessage	The vault already has '{0}'; select it to replace its value.	Kasada zaten '{0}' var; değerini değiştirmek için onu seçin.
+Vault_Stored	Secret stored	Gizli bilgi kaydedildi
+Vault_StoredMessage	Reference it as {0} in a profile.	Bir profilde {0} olarak kullanın.
+Vault_Deleted	Secret deleted	Gizli bilgi silindi
+Vault_DeletedMessage	Deleted '{0}'.	'{0}' silindi.
+
+# Project secrets
+Proj_FolderPlaceholder	Folder to scan, e.g. C:\dev	Taranacak klasör, örn. C:\dev
+Proj_Folder	Folder	Klasör
+Proj_Scan	Scan	Tara
+Proj_Files	Files	Dosyalar
+Proj_Keys	Keys	Anahtarlar
+Proj_ValueHint	Value (empty keeps a hidden one)	Değer (boş bırakılırsa gizli değer korunur)
+Proj_RemoveKey	Remove key	Anahtarı kaldır
+Proj_MoveTitle	Move to vault	Kasaya taşı
+Proj_MoveHint	Stores the value in the vault and leaves ${vault:NAME} in the file; envkit run --env-file fills it in.	Değeri kasaya koyar ve dosyada ${vault:AD} bırakır; envkit run --env-file değeri geri doldurur.
+Proj_Move	Move…	Taşı…
+Proj_VaultName	Vault name	Kasa adı
+Proj_VaultNamePlaceholder	vault name	kasa adı
+Proj_BrowseTitle	Folder to scan for .env files and user secrets	.env dosyaları ve user secrets için taranacak klasör
+Proj_Intro	Choose a folder to find .env files and user secrets.	.env dosyalarını ve user secrets'ları bulmak için bir klasör seçin.
+Proj_Missing	{0} does not exist.	{0} bulunamadı.
+Proj_Scanning	Scanning…	Taranıyor…
+Proj_Found	{0} found	{0} bulundu
+Proj_FoundWarned	{0} found, {1} with git warnings	{0} bulundu, {1} tanesinde git uyarısı var
+Proj_UserSecretsTitle	User secrets · {0}	User secrets · {0}
+Proj_Template	template	şablon
+Proj_Committed	committed to git	git'e commit edilmiş
+Proj_NotIgnored	not in .gitignore	.gitignore'da değil
+Proj_Duplicate	{0} is assigned more than once (the last one wins)	{0} birden fazla kez atanmış (sonuncusu geçerli)
+Proj_InvalidLine	line {0} is not KEY=VALUE	{0}. satır ANAHTAR=DEĞER biçiminde değil
+Proj_NoSecretsYet	no secrets.json yet: saving a key creates it	henüz secrets.json yok: bir anahtar kaydedince oluşturulur
+Proj_ReadOnly	read-only: {0}	salt okunur: {0}
+Proj_NotUtf8	the file is not valid UTF-8	dosya geçerli UTF-8 değil
+Proj_NotJson	secrets.json is not valid JSON	secrets.json geçerli JSON değil
+Proj_Unchanged	Type a new value to replace the hidden one.	Gizli değeri değiştirmek için yeni bir değer yazın.
+Proj_CannotEdit	Cannot edit	Düzenlenemiyor
+Proj_SetDescription	Set {0} in {1}	{1} içinde {0} ayarla
+Proj_RemoveDescription	Remove {0} from {1}	{1} içinden {0} kaldır
+Proj_MoveDescription	Move {0} into the vault as {1} in {2}	{2} içindeki {0} değerini kasaya {1} adıyla taşı
+Proj_NameTakenMessage	The vault already has a different '{0}'.	Kasada farklı bir '{0}' zaten var.
+
+# History
+History_Snapshots	Snapshots	Anlık görüntüler
+History_Restore	Restore…	Geri yükle…
+History_Select	Select a snapshot to see what restoring it would change.	Geri yüklemenin neleri değiştireceğini görmek için bir anlık görüntü seçin.
+History_None	No snapshots yet. One is taken automatically before every change.	Henüz anlık görüntü yok. Her değişiklikten önce otomatik olarak alınır.
+History_Unreadable	This snapshot cannot be read: {0}	Bu anlık görüntü okunamıyor: {0}
+History_Matches	The current state matches this snapshot.	Mevcut durum bu anlık görüntüyle aynı.
+History_WouldChange	Restoring would make these changes:	Geri yükleme şu değişiklikleri yapar:
+History_RestoreDescription	Restore snapshot from {0}	{0} tarihli anlık görüntüyü geri yükle
+
+# Settings
+Settings_Appearance	Appearance	Görünüm
+Settings_Theme	Theme	Tema
+Settings_ThemeHint	"Use Windows setting" follows Windows, also when it switches between light and dark.	"Windows ayarını kullan" Windows'u izler; Windows açık ve koyu arasında geçiş yaptığında uygulama da geçer.
+Settings_Language	Language	Dil
+Settings_LanguageHint	Applies right away. The envkit command line stays in English.	Hemen uygulanır. envkit komut satırı İngilizce kalır.
+Settings_Data	Data	Veriler
+Settings_DataHint	Snapshots, profiles, the vault and these settings live here; anything holding secrets is encrypted for your Windows account.	Anlık görüntüler, profiller, kasa ve bu ayarlar burada durur; gizli bilgi içerenler Windows hesabınız için şifrelenir.
+Settings_OpenFolder	Open folder	Klasörü aç
+Settings_About	About	Hakkında
+Settings_Tagline	Manage Windows environment variables, PATH and credentials safely.	Windows ortam değişkenlerini, PATH'i ve kimlik bilgilerini güvenle yönetin.
+Settings_Version	Version {0}	Sürüm {0}
+Settings_Author	Made by Mustafa Dizdar	Geliştiren: Mustafa Dizdar
+Settings_Profile	GitHub profile	GitHub profili
+Settings_Repository	Source code on GitHub	GitHub'daki kaynak kodu
+Settings_ReportIssue	Report an issue	Sorun bildir
+Settings_License	Open source under the MIT license.	MIT lisansıyla açık kaynak.
+Settings_CheckUpdates	Check for updates	Güncellemeleri denetle
+Settings_Checking	Checking…	Denetleniyor…
+Settings_UpToDate	You have the latest version.	En son sürümü kullanıyorsunuz.
+Settings_UpdateReady	Version {0} is ready: restart to update.	{0} sürümü hazır: güncellemek için yeniden başlatın.
+Settings_NotInstalled	Updates work in the installed app; this copy runs from a build folder.	Güncellemeler kurulu uygulamada çalışır; bu kopya bir derleme klasöründen çalışıyor.
+Settings_UpdateFailed	Could not check for updates: {0}	Güncellemeler denetlenemedi: {0}

@@ -9,7 +9,15 @@
     <!-- Program.Main runs the installer hooks before WPF starts. -->
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
     <StartupObject>EnvKit.App.Program</StartupObject>
+    <ApplicationIcon>Assets\EnvKit.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\EnvKit.ico" />
+    <Resource Include="Assets\EnvKit-128.png" />
+    <None Remove="Assets\EnvKit-256.png" />
+    <None Remove="Resources\Strings.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />

@@ -5,10 +5,12 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             xmlns:l="clr-namespace:EnvKit.App.Localization"
                  xmlns:views="clr-namespace:EnvKit.App.Views"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance vm:MainViewModel}"
                  Title="EnvKit"
+                 Icon="/Assets/EnvKit.ico"
                  Width="1180"
                  Height="760"
                  MinWidth="880"
@@ -36,6 +38,9 @@
     <DataTemplate DataType="{x:Type vm:ProjectSecretsViewModel}">
       <views:ProjectSecretsView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+      <views:SettingsView />
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
       <views:HistoryView />
     </DataTemplate>
@@ -47,7 +52,11 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <ui:TitleBar Grid.Row="0" Title="EnvKit" />
+    <ui:TitleBar Grid.Row="0" Title="EnvKit">
+      <ui:TitleBar.Icon>
+        <ui:ImageIcon Source="/Assets/EnvKit-128.png" />
+      </ui:TitleBar.Icon>
+    </ui:TitleBar>
 
     <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
@@ -71,10 +80,54 @@
                BorderThickness="0"
                ItemsSource="{Binding Pages}"
                SelectedItem="{Binding SelectedPage}"
-               AutomationProperties.Name="Navigation">
+               AutomationProperties.Name="{l:Tr Main_Navigation}">
+        <!-- Windows 11 style: a subtle fill and an accent bar, readable in light and dark. -->
+        <ListBox.ItemContainerStyle>
+          <Style TargetType="ListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <!-- Shown for keyboard navigation only, not after a mouse click. -->
+            <Setter Property="FocusVisualStyle">
+              <Setter.Value>
+                <Style>
+                  <Setter Property="Control.Template">
+                    <Setter.Value>
+                      <ControlTemplate>
+                        <Border CornerRadius="4" BorderThickness="2" BorderBrush="{DynamicResource FocusStrokeColorOuterBrush}" />
+                      </ControlTemplate>
+                    </Setter.Value>
+                  </Setter>
+                </Style>
+              </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                  <Border x:Name="Chrome" Background="Transparent" CornerRadius="4" Padding="8,0">
+                    <Grid>
+                      <Rectangle x:Name="Indicator" Width="3" Height="16" RadiusX="1.5" RadiusY="1.5" HorizontalAlignment="Left"
+                                 Margin="-6,0,0,0" Fill="{DynamicResource AccentFillColorDefaultBrush}" Visibility="Collapsed" />
+                      <ContentPresenter />
+                    </Grid>
+                  </Border>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                      <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                      <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ListBox.ItemContainerStyle>
         <ListBox.ItemTemplate>
           <DataTemplate>
-            <StackPanel Orientation="Horizontal" Margin="4,6">
+            <StackPanel Orientation="Horizontal" Margin="4,9">
               <ui:SymbolIcon Symbol="{Binding Icon}" FontSize="18" Margin="0,0,12,0" />
               <TextBlock Text="{Binding Title}" VerticalAlignment="Center" FontSize="14" />
             </StackPanel>
@@ -123,7 +176,7 @@
             <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
 
-          <TextBlock Grid.Row="0" Text="Review changes" Style="{StaticResource PageTitle}" />
+          <TextBlock Grid.Row="0" Text="{l:Tr Review_Title}" Style="{StaticResource PageTitle}" />
           <TextBlock Grid.Row="1" Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,0,0,12" />
 
           <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
@@ -163,16 +216,16 @@
 
           <StackPanel Grid.Row="3" Margin="0,8,0,0">
             <TextBlock Style="{StaticResource Problem}"
-                       Text="Includes machine-scope changes: Windows will ask for administrator approval."
+                       Text="{l:Tr Review_Elevation}"
                        Visibility="{Binding RequiresElevation, Converter={StaticResource BoolToVisibility}}" />
             <TextBlock Style="{StaticResource Problem}" FontWeight="SemiBold"
-                       Text="Some deletions cannot be undone: Windows never reveals the secret of domain credentials."
+                       Text="{l:Tr Review_Irreversible}"
                        Visibility="{Binding HasIrreversibleChanges, Converter={StaticResource BoolToVisibility}}" />
           </StackPanel>
 
           <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <ui:Button Content="Cancel" Command="{Binding CancelCommand}" Margin="0,0,8,0" MinWidth="96" />
-            <ui:Button Content="Apply" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
+            <ui:Button Content="{l:Tr Common_Cancel}" Command="{Binding CancelCommand}" Margin="0,0,8,0" MinWidth="96" />
+            <ui:Button Content="{l:Tr Common_Apply}" Appearance="Primary" Icon="{ui:SymbolIcon Checkmark24}"
                        Command="{Binding ApplyCommand}" MinWidth="96" />
           </StackPanel>
         </Grid>

@@ -49,6 +49,7 @@ dotnet vpk pack `
     --packAuthors 'EnvKit contributors' `
     --packDir $publish `
     --mainExe EnvKit.exe `
+    --icon (Join-Path $root 'src\EnvKit.App\Assets\EnvKit.ico') `
     --runtime $Runtime `
     --outputDir $release
 Assert-Success 'Packing'

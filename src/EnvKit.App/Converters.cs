@@ -58,7 +58,7 @@ public sealed class DiffLineTextConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         value is DiffLine line
-            ? $"{(line.Kind == DiffKind.Added ? '+' : '-')} {(line.Text.Trim().Length == 0 ? "(empty)" : line.Text)}"
+            ? $"{(line.Kind == DiffKind.Added ? '+' : '-')} {(line.Text.Trim().Length == 0 ? Localization.Loc.Get("Common_Empty") : line.Text)}"
             : string.Empty;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>

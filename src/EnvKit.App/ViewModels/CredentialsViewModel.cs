@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EnvKit.App.Localization;
 using EnvKit.Core.Credentials;
 using Wpf.Ui.Controls;
 
@@ -17,7 +18,7 @@ public sealed partial class CredentialRow(Credential credential) : ObservableObj
 
     public string UserName => Credential.State.UserName ?? string.Empty;
 
-    public string KindLabel => Credential.Kind == CredentialKind.Generic ? string.Empty : Credential.Kind.ToString();
+    public string KindLabel => Credential.Kind == CredentialKind.Generic ? string.Empty : EnumTextConverter.Text(Credential.Kind);
 
     public DateTimeOffset LastWritten => Credential.LastWritten.ToLocalTime();
 
@@ -36,7 +37,7 @@ public sealed partial class CredentialsViewModel : PageViewModel
     private List<Credential> _all = [];
 
     public CredentialsViewModel(AppServices services, MainViewModel main)
-        : base("Credentials", SymbolRegular.Key24)
+        : base("Page_Credentials", SymbolRegular.Key24)
     {
         _services = services;
         _main = main;
@@ -87,19 +88,19 @@ public sealed partial class CredentialsViewModel : PageViewModel
     [NotifyPropertyChangedFor(nameof(DeleteLabel))]
     public partial int DeleteCount { get; set; }
 
-    public string DeleteLabel => DeleteCount <= 1 ? "Delete…" : $"Delete {DeleteCount}…";
+    public string DeleteLabel => DeleteCount <= 1 ? Loc.Get("Creds_Delete") : Loc.Format("Creds_DeleteMany", DeleteCount);
 
     [ObservableProperty]
     public partial string Summary { get; set; } = string.Empty;
 
     public bool IsNew => Selected is null;
 
-    public string EditorTitle => IsNew ? "New credential" : "Edit credential";
+    public string EditorTitle => Loc.Get(IsNew ? "Creds_NewTitle" : "Creds_EditTitle");
 
     /// <summary>Domain credentials: Windows keeps the secret, so they can be deleted but not edited.</summary>
     public bool IsReadOnlyKind => Selected is { Credential.IsEditable: false };
 
-    public string PasswordHint => IsNew ? "Password" : "New password (leave empty to keep the current one)";
+    public string PasswordHint => Loc.Get(IsNew ? "Creds_PasswordNew" : "Creds_PasswordEdit");
 
     public override void Refresh()
     {
@@ -108,14 +109,21 @@ public sealed partial class CredentialsViewModel : PageViewModel
         _all = [.. _services.Credentials.List()];
 
         Groups.Clear();
-        Groups.Add(new GroupOption(null, $"All ({_all.Count})"));
+        Groups.Add(new GroupOption(null, Loc.Format("Creds_All", _all.Count)));
         foreach (var group in _all.GroupBy(c => CredentialClassifier.Classify(c.Key)).OrderBy(g => g.Key))
         {
-            Groups.Add(new GroupOption(group.Key, $"{group.Key} ({group.Count()})"));
+            Groups.Add(new GroupOption(group.Key, Loc.Format("Creds_GroupCount", EnumTextConverter.Text(group.Key), group.Count())));
         }
 
         SelectedGroup = Groups.FirstOrDefault(g => g.Group == keepGroup) ?? Groups[0];
         Filter(keepSelected);
+    }
+
+    /// <summary>Group labels and the summary are texts; rebuilding them reselects the same rows.</summary>
+    public override void OnLanguageChanged()
+    {
+        Refresh();
+        base.OnLanguageChanged();
     }
 
     partial void OnSelectedGroupChanged(GroupOption? value) => Filter(Selected?.Credential.Key);
@@ -170,11 +178,11 @@ public sealed partial class CredentialsViewModel : PageViewModel
 
         try
         {
-            _main.RequestReview(_services.NewPlan().SetCredential(key, state).Build($"Set credential {key}"));
+            _main.RequestReview(_services.NewPlan().SetCredential(key, state).Build(Loc.Format("Creds_SetDescription", key)));
         }
         catch (ArgumentException ex)
         {
-            _main.ShowStatus(InfoBarSeverity.Error, "Invalid credential", ex.Message);
+            _main.ShowStatus(InfoBarSeverity.Error, Loc.Get("Creds_Invalid"), ex.Message);
         }
     }
 
@@ -191,14 +199,14 @@ public sealed partial class CredentialsViewModel : PageViewModel
             builder.DeleteCredential(row.Credential.Key);
         }
 
-        _main.RequestReview(builder.Build($"Delete {targets.Count} credential(s)"));
+        _main.RequestReview(builder.Build(Loc.Format("Creds_DeleteDescription", targets.Count)));
     }
 
     /// <summary>Writes the visible rows without secrets; the view picks the file.</summary>
     public void ExportTo(string path)
     {
         File.WriteAllText(path, CredentialExport.ToJson(Rows.Select(r => r.Credential)));
-        _main.ShowStatus(InfoBarSeverity.Success, "Exported", $"{Rows.Count} credential(s) written to {path}. No secrets are included.");
+        _main.ShowStatus(InfoBarSeverity.Success, Loc.Get("Creds_Exported"), Loc.Format("Creds_ExportedMessage", Rows.Count, path));
     }
 
     private List<CredentialRow> DeleteTargets()
@@ -227,7 +235,7 @@ public sealed partial class CredentialsViewModel : PageViewModel
         }
 
         Selected = Rows.FirstOrDefault(r => r.Credential.Key == keepSelected);
-        Summary = $"{Rows.Count} shown";
+        Summary = Loc.Format("Creds_Shown", Rows.Count);
         UpdateDeleteCount();
     }
 
