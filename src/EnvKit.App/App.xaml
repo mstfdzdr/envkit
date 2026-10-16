@@ -13,6 +13,7 @@
       <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
       <local:NullToVisibilityConverter x:Key="NullToVisibility" />
       <local:InverseBoolConverter x:Key="InverseBool" />
+      <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
       <local:DiffLineBrushConverter x:Key="DiffLineBrush" />
       <local:DiffLineTextConverter x:Key="DiffLineText" />
 

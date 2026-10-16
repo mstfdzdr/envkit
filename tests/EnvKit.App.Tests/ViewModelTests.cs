@@ -26,6 +26,8 @@ public class ViewModelTests
         Updater = updater,
         Store = store ?? _store,
         Credentials = _credentials,
+        Vault = new InMemoryVault(),
+        Profiles = new InMemoryProfileStore(),
         FileSystem = new FakeFileSystem().WithDirectories(@"C:\Windows", @"C:\a", @"C:\b"),
         Snapshots = _snapshots,
         Broadcaster = _broadcaster,

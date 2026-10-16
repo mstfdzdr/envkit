@@ -26,8 +26,10 @@ public sealed partial class MainViewModel : ObservableObject
         Variables = new VariablesViewModel(services, this);
         Path = new PathViewModel(services, this);
         Credentials = new CredentialsViewModel(services, this);
+        Profiles = new ProfilesViewModel(services, this);
+        Vault = new VaultViewModel(services, this);
         History = new HistoryViewModel(services, this);
-        Pages = [Path, Variables, Credentials, History];
+        Pages = [Path, Variables, Credentials, Profiles, Vault, History];
         SelectedPage = Path;
     }
 
@@ -36,6 +38,10 @@ public sealed partial class MainViewModel : ObservableObject
     public PathViewModel Path { get; }
 
     public CredentialsViewModel Credentials { get; }
+
+    public ProfilesViewModel Profiles { get; }
+
+    public VaultViewModel Vault { get; }
 
     public HistoryViewModel History { get; }
 

@@ -27,6 +27,12 @@
     <DataTemplate DataType="{x:Type vm:CredentialsViewModel}">
       <views:CredentialsView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ProfilesViewModel}">
+      <views:ProfilesView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:VaultViewModel}">
+      <views:VaultView />
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
       <views:HistoryView />
     </DataTemplate>

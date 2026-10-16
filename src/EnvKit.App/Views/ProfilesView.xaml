@@ -1,0 +1,133 @@
+<UserControl x:Class="EnvKit.App.Views.ProfilesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:vm="clr-namespace:EnvKit.App.ViewModels"
+             mc:Ignorable="d"
+             x:Name="Root"
+             d:DataContext="{d:DesignInstance vm:ProfilesViewModel}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="240" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Profiles" Style="{StaticResource PageTitle}" />
+
+    <DockPanel Grid.Row="1" Grid.Column="0">
+      <ui:Button DockPanel.Dock="Bottom" Margin="0,12,0,0" HorizontalAlignment="Stretch" Content="New profile"
+                 Icon="{ui:SymbolIcon Add24}" Command="{Binding NewCommand}" />
+      <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding Selected}" AutomationProperties.Name="Profiles">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Margin="0,2">
+              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" FontSize="12" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <Grid Grid.Row="1" Grid.Column="1" Margin="16,0,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="2*" />
+      </Grid.ColumnDefinitions>
+
+      <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,12">
+        <TextBlock Text="Name" Margin="0,0,0,4" />
+        <ui:TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="e.g. java21"
+                    AutomationProperties.Name="Profile name" />
+      </StackPanel>
+      <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,12">
+        <TextBlock Text="Description" Margin="0,0,0,4" />
+        <ui:TextBox Text="{Binding EditDescription, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Description" />
+      </StackPanel>
+
+      <DockPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,8" LastChildFill="False">
+        <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontWeight="SemiBold" Text="Actions, applied in order" />
+        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon Delete24}" Command="{Binding RemoveActionCommand}"
+                   ToolTip="Remove action" AutomationProperties.Name="Remove action" Margin="8,0,0,0" />
+        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon ArrowDown24}" Command="{Binding MoveActionDownCommand}"
+                   ToolTip="Move down" AutomationProperties.Name="Move action down" Margin="8,0,0,0" />
+        <ui:Button DockPanel.Dock="Right" Icon="{ui:SymbolIcon ArrowUp24}" Command="{Binding MoveActionUpCommand}"
+                   ToolTip="Move up" AutomationProperties.Name="Move action up" Margin="8,0,0,0" />
+        <ui:Button DockPanel.Dock="Right" Content="Add action" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddActionCommand}" />
+      </DockPanel>
+
+      <DataGrid Grid.Row="2" Grid.ColumnSpan="2"
+                ItemsSource="{Binding Actions}"
+                SelectedItem="{Binding SelectedAction}"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserSortColumns="False"
+                SelectionMode="Single"
+                HeadersVisibility="Column"
+                GridLinesVisibility="None"
+                AutomationProperties.Name="Actions">
+        <DataGrid.Columns>
+          <DataGridTemplateColumn Header="Action" Width="150">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <ComboBox ItemsSource="{Binding DataContext.ActionKinds, ElementName=Root}"
+                          SelectedItem="{Binding Kind, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Action kind" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Variable" Width="180">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding UsesName}"
+                            AutomationProperties.Name="Variable" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Value or directory" Width="*">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <ui:TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" FontFamily="Cascadia Mono, Consolas"
+                            AutomationProperties.Name="Value" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+
+      <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Margin="0,8,0,0">
+        <TextBlock Style="{StaticResource Muted}" FontSize="12"
+                   Text="Values may use %VARIABLES% (expanded in order, so %JAVA_HOME%\bin follows a JAVA_HOME set above) and ${vault:NAME} for vault secrets." />
+        <TextBlock Margin="0,4,0,0" Style="{StaticResource Problem}" Text="{Binding MissingSecrets}" />
+      </StackPanel>
+
+      <DockPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                 Visibility="{Binding IsNew, Converter={StaticResource InverseBoolToVisibility}}">
+        <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="Run with it:" Margin="0,0,8,0" />
+        <ui:Button DockPanel.Dock="Right" Content="Copy" Icon="{ui:SymbolIcon Copy24}" Click="OnCopyRunCommand" Margin="8,0,0,0" />
+        <TextBox IsReadOnly="True" Text="{Binding RunCommandText, Mode=OneWay}" FontFamily="Cascadia Mono, Consolas"
+                 AutomationProperties.Name="Run command" />
+      </DockPanel>
+
+      <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <ui:Button Content="Delete" Appearance="Danger" Icon="{ui:SymbolIcon Delete24}" Command="{Binding DeleteCommand}" Margin="0,0,8,0" />
+        <ui:Button Content="Save profile" Icon="{ui:SymbolIcon Save24}" Command="{Binding SaveCommand}" Margin="0,0,8,0" />
+        <ui:Button Content="Apply to my environment…" Appearance="Primary" Icon="{ui:SymbolIcon Play24}" Command="{Binding ApplyCommand}"
+                   ToolTip="Writes the saved profile to the user environment after a review. Profiles using vault secrets can only be run." />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

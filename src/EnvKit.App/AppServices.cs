@@ -1,8 +1,10 @@
 using EnvKit.Core.Credentials;
 using EnvKit.Core.IO;
 using EnvKit.Core.Plans;
+using EnvKit.Core.Profiles;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
+using EnvKit.Core.Vault;
 using EnvKit.Windows.Credentials;
 using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
@@ -15,6 +17,10 @@ public sealed class AppServices
     public required IEnvStore Store { get; init; }
 
     public required ICredentialStore Credentials { get; init; }
+
+    public required IVault Vault { get; init; }
+
+    public required IProfileStore Profiles { get; init; }
 
     public required IFileSystem FileSystem { get; init; }
 
@@ -35,6 +41,8 @@ public sealed class AppServices
         Updater = new VelopackUpdater(),
         Store = new RegistryEnvStore(),
         Credentials = new WindowsCredentialStore(),
+        Vault = new FileVault(FileVault.DefaultPath, new DpapiProtector()),
+        Profiles = new FileProfileStore(FileProfileStore.DefaultDirectory),
         FileSystem = PhysicalFileSystem.Instance,
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
         Broadcaster = new SettingChangeBroadcaster(),
