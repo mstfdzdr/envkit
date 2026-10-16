@@ -9,15 +9,10 @@ public static class PathIssueText
         ArgumentNullException.ThrowIfNull(issue);
         return issue.Kind switch
         {
-            PathIssueKind.Empty => "empty",
-            PathIssueKind.Missing => "missing",
-            PathIssueKind.Duplicate => $"duplicate of {issue.DuplicateOf!.Scope}#{issue.DuplicateOf.Index}",
-            PathIssueKind.Quoted => "quoted",
-            PathIssueKind.UnresolvedVariable => $"unresolved: {issue.Detail}",
-            PathIssueKind.NotExpanded => "not expanded: PATH is REG_SZ",
-            PathIssueKind.NotFullyQualified => "relative path",
-            PathIssueKind.ValueTooLong => $"value too long: {issue.Detail} > {EnvVariable.MaxValueLength} characters",
-            _ => issue.Kind.ToString(),
+            PathIssueKind.Duplicate => CoreText.Format("Issue_Duplicate", CoreText.Scope(issue.DuplicateOf!.Scope), issue.DuplicateOf.Index),
+            PathIssueKind.UnresolvedVariable => CoreText.Format("Issue_UnresolvedVariable", issue.Detail),
+            PathIssueKind.ValueTooLong => CoreText.Format("Issue_ValueTooLong", issue.Detail, EnvVariable.MaxValueLength),
+            _ => CoreText.Get($"Issue_{issue.Kind}"),
         };
     }
 }

@@ -23,6 +23,9 @@ public static class EnvKitCli
     public static int Run(CliServices services, string[] args)
     {
         ArgumentNullException.ThrowIfNull(services);
+
+        // The CLI speaks English whatever the system language, so output is stable for scripts.
+        Core.CoreText.Culture = System.Globalization.CultureInfo.InvariantCulture;
         var configuration = new InvocationConfiguration { Output = services.Out, Error = services.Error };
         return Create(services).Parse(args).Invoke(configuration);
     }

@@ -30,7 +30,7 @@ public sealed record VariableChange(EnvScope Scope, string Name, VariableValue? 
 {
     public override bool RequiresElevation => Scope == EnvScope.Machine;
 
-    public override string Subject => $@"{Scope}\{Name}";
+    public override string Subject => $@"{CoreText.Scope(Scope)}\{Name}";
 }
 
 /// <summary>Credential Manager is per user, so these never need elevation.</summary>
@@ -40,7 +40,7 @@ public sealed record CredentialChange(CredentialKey Key, CredentialState? Before
 {
     public override bool RequiresElevation => false;
 
-    public override string Subject => $"Credential {Key}";
+    public override string Subject => CoreText.Format("Subject_Credential", Key);
 
     /// <summary>
     /// Deleting a domain credential cannot be undone: Windows never returns its secret, so
@@ -66,7 +66,7 @@ public sealed record FileChange(string Path, FileFormat Format, byte[]? Before, 
 {
     public override bool RequiresElevation => false;
 
-    public override string Subject => $"{(Format == FileFormat.DotEnv ? ".env" : "user secrets")} {Path}";
+    public override string Subject => CoreText.Format(Format == FileFormat.DotEnv ? "Subject_DotEnv" : "Subject_UserSecrets", Path);
 
     public bool Equals(FileChange? other) =>
         other is not null && Path == other.Path && Format == other.Format && SameBytes(Before, other.Before) && SameBytes(After, other.After);

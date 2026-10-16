@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>  <data name="Scope_User" xml:space="preserve"><value>User</value></data>
+  <data name="Scope_Machine" xml:space="preserve"><value>Machine</value></data>
+  <data name="Persistence_LocalMachine" xml:space="preserve"><value>This computer</value></data>
+  <data name="Persistence_Enterprise" xml:space="preserve"><value>Roaming</value></data>
+  <data name="Persistence_Session" xml:space="preserve"><value>This session</value></data>
+  <data name="Subject_Credential" xml:space="preserve"><value>Credential {0}</value></data>
+  <data name="Subject_DotEnv" xml:space="preserve"><value>.env {0}</value></data>
+  <data name="Subject_UserSecrets" xml:space="preserve"><value>User secrets {0}</value></data>
+  <data name="Note_New" xml:space="preserve"><value>new</value></data>
+  <data name="Note_Delete" xml:space="preserve"><value>delete</value></data>
+  <data name="Note_DeleteIrreversible" xml:space="preserve"><value>delete; Windows never reveals this secret, so it cannot be restored</value></data>
+  <data name="Note_NewFile" xml:space="preserve"><value>new file</value></data>
+  <data name="Note_DeleteFile" xml:space="preserve"><value>delete file</value></data>
+  <data name="Field_User" xml:space="preserve"><value>user</value></data>
+  <data name="Field_Comment" xml:space="preserve"><value>comment</value></data>
+  <data name="Field_Persistence" xml:space="preserve"><value>persistence</value></data>
+  <data name="Line_PasswordSet" xml:space="preserve"><value>password: set</value></data>
+  <data name="Line_PasswordChanged" xml:space="preserve"><value>password: changed</value></data>
+  <data name="Line_KeyChanged" xml:space="preserve"><value>{0}: changed</value></data>
+  <data name="Line_ContentChanged" xml:space="preserve"><value>content changed</value></data>
+  <data name="Line_FormattingChanged" xml:space="preserve"><value>formatting changed</value></data>
+  <data name="Issue_Empty" xml:space="preserve"><value>empty</value></data>
+  <data name="Issue_Missing" xml:space="preserve"><value>missing</value></data>
+  <data name="Issue_Duplicate" xml:space="preserve"><value>duplicate of {0}#{1}</value></data>
+  <data name="Issue_Quoted" xml:space="preserve"><value>quoted</value></data>
+  <data name="Issue_UnresolvedVariable" xml:space="preserve"><value>unresolved: {0}</value></data>
+  <data name="Issue_NotExpanded" xml:space="preserve"><value>not expanded: PATH is REG_SZ</value></data>
+  <data name="Issue_NotFullyQualified" xml:space="preserve"><value>relative path</value></data>
+  <data name="Issue_ValueTooLong" xml:space="preserve"><value>value too long: {0} &gt; {1} characters</value></data>
+</root>

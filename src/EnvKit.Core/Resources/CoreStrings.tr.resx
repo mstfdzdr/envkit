@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>  <data name="Scope_User" xml:space="preserve"><value>Kullanıcı</value></data>
+  <data name="Scope_Machine" xml:space="preserve"><value>Sistem</value></data>
+  <data name="Persistence_LocalMachine" xml:space="preserve"><value>Bu bilgisayar</value></data>
+  <data name="Persistence_Enterprise" xml:space="preserve"><value>Dolaşımlı</value></data>
+  <data name="Persistence_Session" xml:space="preserve"><value>Bu oturum</value></data>
+  <data name="Subject_Credential" xml:space="preserve"><value>Kimlik bilgisi {0}</value></data>
+  <data name="Subject_DotEnv" xml:space="preserve"><value>.env {0}</value></data>
+  <data name="Subject_UserSecrets" xml:space="preserve"><value>User secrets {0}</value></data>
+  <data name="Note_New" xml:space="preserve"><value>yeni</value></data>
+  <data name="Note_Delete" xml:space="preserve"><value>silinecek</value></data>
+  <data name="Note_DeleteIrreversible" xml:space="preserve"><value>silinecek; Windows bu gizli bilgiyi hiç vermediği için geri yüklenemez</value></data>
+  <data name="Note_NewFile" xml:space="preserve"><value>yeni dosya</value></data>
+  <data name="Note_DeleteFile" xml:space="preserve"><value>dosya silinecek</value></data>
+  <data name="Field_User" xml:space="preserve"><value>kullanıcı</value></data>
+  <data name="Field_Comment" xml:space="preserve"><value>yorum</value></data>
+  <data name="Field_Persistence" xml:space="preserve"><value>kalıcılık</value></data>
+  <data name="Line_PasswordSet" xml:space="preserve"><value>parola: ayarlandı</value></data>
+  <data name="Line_PasswordChanged" xml:space="preserve"><value>parola: değişti</value></data>
+  <data name="Line_KeyChanged" xml:space="preserve"><value>{0}: değişti</value></data>
+  <data name="Line_ContentChanged" xml:space="preserve"><value>içerik değişti</value></data>
+  <data name="Line_FormattingChanged" xml:space="preserve"><value>yalnızca biçim değişti</value></data>
+  <data name="Issue_Empty" xml:space="preserve"><value>boş</value></data>
+  <data name="Issue_Missing" xml:space="preserve"><value>klasör yok</value></data>
+  <data name="Issue_Duplicate" xml:space="preserve"><value>{0}#{1} ile aynı</value></data>
+  <data name="Issue_Quoted" xml:space="preserve"><value>tırnaklı</value></data>
+  <data name="Issue_UnresolvedVariable" xml:space="preserve"><value>çözülemedi: {0}</value></data>
+  <data name="Issue_NotExpanded" xml:space="preserve"><value>genişletilmiyor: PATH REG_SZ</value></data>
+  <data name="Issue_NotFullyQualified" xml:space="preserve"><value>göreli yol</value></data>
+  <data name="Issue_ValueTooLong" xml:space="preserve"><value>değer çok uzun: {0} &gt; {1} karakter</value></data>
+</root>

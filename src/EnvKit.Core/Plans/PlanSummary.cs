@@ -1,3 +1,4 @@
+using EnvKit.Core.Credentials;
 using EnvKit.Core.DotEnv;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Security;
@@ -31,8 +32,8 @@ public static class PlanSummary
         ArgumentNullException.ThrowIfNull(change);
         var note = (change.Before, change.After) switch
         {
-            (null, _) => "new file",
-            (_, null) => "delete file",
+            (null, _) => CoreText.Get("Note_NewFile"),
+            (_, null) => CoreText.Get("Note_DeleteFile"),
             _ => string.Empty,
         };
 
@@ -40,7 +41,7 @@ public static class PlanSummary
         var after = ReadKeys(change.Format, change.After);
         if (before is null || after is null)
         {
-            return new ChangeSummary(change.Subject, note, [new DiffLine(DiffKind.Added, "content changed")]);
+            return new ChangeSummary(change.Subject, note, [new DiffLine(DiffKind.Added, CoreText.Get("Line_ContentChanged"))]);
         }
 
         var comparer = change.Format == FileFormat.DotEnv ? StringComparer.Ordinal : UserSecretsDocument.KeyComparer;
@@ -62,7 +63,7 @@ public static class PlanSummary
 
             if (had && has && (SecretDetector.LooksSecret(key, oldValue!) || SecretDetector.LooksSecret(key, newValue!)))
             {
-                lines.Add(new DiffLine(DiffKind.Added, $"{key}: changed"));
+                lines.Add(new DiffLine(DiffKind.Added, CoreText.Format("Line_KeyChanged", key)));
                 continue;
             }
 
@@ -79,7 +80,7 @@ public static class PlanSummary
 
         if (lines.Count == 0)
         {
-            lines.Add(new DiffLine(DiffKind.Added, "formatting changed"));
+            lines.Add(new DiffLine(DiffKind.Added, CoreText.Get("Line_FormattingChanged")));
         }
 
         return new ChangeSummary(change.Subject, note, lines);
@@ -129,22 +130,22 @@ public static class PlanSummary
             }
         }
 
-        Field("user", before?.UserName, after?.UserName);
-        Field("comment", before?.Comment, after?.Comment);
-        Field("persistence", before?.Persistence.ToString(), after?.Persistence.ToString());
+        Field(CoreText.Get("Field_User"), before?.UserName, after?.UserName);
+        Field(CoreText.Get("Field_Comment"), before?.Comment, after?.Comment);
+        Field(CoreText.Get("Field_Persistence"), Persistence(before?.Persistence), Persistence(after?.Persistence));
 
         var secretChanged = before?.Secret is null != after?.Secret is null
             || (before?.Secret is { } b && after?.Secret is { } a && !b.AsSpan().SequenceEqual(a));
         if (after is not null && secretChanged)
         {
-            lines.Add(new DiffLine(DiffKind.Added, before is null ? "password: set" : "password: changed"));
+            lines.Add(new DiffLine(DiffKind.Added, CoreText.Get(before is null ? "Line_PasswordSet" : "Line_PasswordChanged")));
         }
 
         var note = (before, after) switch
         {
-            (null, _) => "new",
-            (_, null) when change.IsIrreversible => "delete; Windows never reveals this secret, so it cannot be restored",
-            (_, null) => "delete",
+            (null, _) => CoreText.Get("Note_New"),
+            (_, null) when change.IsIrreversible => CoreText.Get("Note_DeleteIrreversible"),
+            (_, null) => CoreText.Get("Note_Delete"),
             _ => string.Empty,
         };
         return new ChangeSummary(change.Subject, note, lines);
@@ -156,8 +157,12 @@ public static class PlanSummary
         var lines = EnvVariable.NameComparer.Equals(change.Name, PathAnalyzer.VariableName)
             ? [.. PathDiff.Compute(change.Before?.Value, change.After?.Value).Where(l => l.Kind != DiffKind.Unchanged)]
             : ValueLines(change);
-        return new ChangeSummary($@"{change.Scope}\{change.Name}", Note(change), lines);
+        return new ChangeSummary(change.Subject, Note(change), lines);
     }
+
+    /// <summary>A display name for a persistence setting; <see langword="null"/> stays null.</summary>
+    public static string? Persistence(CredentialPersistence? persistence) =>
+        persistence is { } p ? CoreText.Get($"Persistence_{p}") : null;
 
     public static string RegistryName(this EnvValueKind kind) =>
         kind == EnvValueKind.Expandable ? "REG_EXPAND_SZ" : "REG_SZ";
@@ -180,8 +185,8 @@ public static class PlanSummary
 
     private static string Note(VariableChange change) => (change.Before, change.After) switch
     {
-        (null, _) => "new",
-        (_, null) => "delete",
+        (null, _) => CoreText.Get("Note_New"),
+        (_, null) => CoreText.Get("Note_Delete"),
         ({ } b, { } a) when b.Kind != a.Kind => $"{b.Kind.RegistryName()} -> {a.Kind.RegistryName()}",
         _ => string.Empty,
     };

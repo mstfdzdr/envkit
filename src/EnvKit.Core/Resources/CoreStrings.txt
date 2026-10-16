@@ -1,0 +1,31 @@
+# key	English	Türkçe
+# Generates CoreStrings.resx and CoreStrings.tr.resx: ./build/New-Resx.ps1 -Table src/EnvKit.Core/Resources/CoreStrings.txt -Output src/EnvKit.Core/Resources/CoreStrings
+Scope_User	User	Kullanıcı
+Scope_Machine	Machine	Sistem
+Persistence_LocalMachine	This computer	Bu bilgisayar
+Persistence_Enterprise	Roaming	Dolaşımlı
+Persistence_Session	This session	Bu oturum
+Subject_Credential	Credential {0}	Kimlik bilgisi {0}
+Subject_DotEnv	.env {0}	.env {0}
+Subject_UserSecrets	User secrets {0}	User secrets {0}
+Note_New	new	yeni
+Note_Delete	delete	silinecek
+Note_DeleteIrreversible	delete; Windows never reveals this secret, so it cannot be restored	silinecek; Windows bu gizli bilgiyi hiç vermediği için geri yüklenemez
+Note_NewFile	new file	yeni dosya
+Note_DeleteFile	delete file	dosya silinecek
+Field_User	user	kullanıcı
+Field_Comment	comment	yorum
+Field_Persistence	persistence	kalıcılık
+Line_PasswordSet	password: set	parola: ayarlandı
+Line_PasswordChanged	password: changed	parola: değişti
+Line_KeyChanged	{0}: changed	{0}: değişti
+Line_ContentChanged	content changed	içerik değişti
+Line_FormattingChanged	formatting changed	yalnızca biçim değişti
+Issue_Empty	empty	boş
+Issue_Missing	missing	klasör yok
+Issue_Duplicate	duplicate of {0}#{1}	{0}#{1} ile aynı
+Issue_Quoted	quoted	tırnaklı
+Issue_UnresolvedVariable	unresolved: {0}	çözülemedi: {0}
+Issue_NotExpanded	not expanded: PATH is REG_SZ	genişletilmiyor: PATH REG_SZ
+Issue_NotFullyQualified	relative path	göreli yol
+Issue_ValueTooLong	value too long: {0} > {1} characters	değer çok uzun: {0} > {1} karakter
