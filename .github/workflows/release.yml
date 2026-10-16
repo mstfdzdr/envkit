@@ -29,9 +29,22 @@ jobs:
       # Code signing (SignPath) goes here once the project is approved; until then the
       # installer is unsigned and SmartScreen will warn on first run.
 
+      # With the previous release next to the new one, vpk pack also builds a delta package,
+      # so installed apps download only what changed instead of the whole app.
+      - name: Download previous release
+        shell: pwsh
+        run: |
+          dotnet tool restore
+          dotnet vpk download github `
+            --outputDir artifacts/release `
+            --repoUrl ${{ github.server_url }}/${{ github.repository }} `
+            --token ${{ secrets.GITHUB_TOKEN }}
+          if ($LASTEXITCODE -ne 0) { Write-Host "No previous release found; packing without a delta." }
+          exit 0
+
       - name: Pack
         shell: pwsh
-        run: ./build/pack.ps1 -Version ${{ steps.version.outputs.value }}
+        run: ./build/pack.ps1 -Version ${{ steps.version.outputs.value }} -KeepPreviousReleases
 
       - name: Publish release
         shell: pwsh

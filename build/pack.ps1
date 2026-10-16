@@ -14,7 +14,11 @@
 param(
     [Parameter(Mandatory)] [string] $Version,
     [string] $Runtime = 'win-x64',
-    [string] $Configuration = 'Release'
+    [string] $Configuration = 'Release',
+
+    # Keep artifacts\release, e.g. after 'vpk download github' put the previous release there:
+    # vpk pack then adds a delta package, so installed apps download only what changed.
+    [switch] $KeepPreviousReleases
 )
 
 $ErrorActionPreference = 'Stop'
@@ -26,7 +30,8 @@ function Assert-Success([string] $Step) {
     if ($LASTEXITCODE -ne 0) { throw "$Step failed with exit code $LASTEXITCODE." }
 }
 
-foreach ($dir in $publish, $release) {
+$clean = if ($KeepPreviousReleases) { @($publish) } else { @($publish, $release) }
+foreach ($dir in $clean) {
     if (Test-Path $dir) { Remove-Item -Recurse -Force $dir }
 }
 
