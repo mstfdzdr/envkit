@@ -90,9 +90,12 @@ Düzenleme, dosyanın geri kalanına dokunmadan yapılmalı:
 - `PathEntry { Raw, Expanded, Directory, Scope, Index }` + `PathReport { Entries, Issues[] }`
   - Sorun türleri: `Empty`, `Missing`, `Duplicate`, `Quoted`, `UnresolvedVariable`, `NotExpanded` (REG_SZ PATH içinde `%VAR%`), `NotFullyQualified`, `ValueTooLong`
   - Makine değişkenleri kullanıcı değişkenlerinden önce expand edilir; System PATH kullanıcıya özel bir değişkeni referanslayamaz.
-- `ChangePlan { Id, Operations[], RequiresElevation }`
-  - Operasyonlar: `SetVar`, `DeleteVar`, `PathInsert`, `PathRemove`, `PathMove`, `CredWrite`, `CredDelete`, `DotEnvSet`, `DotEnvDelete`, `DotEnvRename`
-- `Snapshot { Id, CreatedAt, Reason, PlanId, State }`
+- `ChangePlan { Id, Description, CreatedAt, Changes[], RequiresElevation }`
+  - Her değişiklik **önce/sonra** durumu olarak tutulur (`VariableChange { Scope, Name, Before, After }`; `Before = null` oluşturma, `After = null` silme). Plan aynı zamanda diff'tir.
+  - `Before`, uygulama anında ön koşul olarak tekrar kontrol edilir; arada değişen bir değer varsa `PlanConflictException`.
+  - PATH ekleme/çıkarma/sıralama `PlanBuilder` yardımcılarıdır, ayrı operasyon türü değildir. İleride `CredentialChange`, `DotEnvChange` aynı `PlanChange` tabanından türeyecek.
+  - Uygulama sırasında bir yazma başarısız olursa önceki yazmalar geri alınır.
+- `Snapshot { Info { Id, CreatedAt, Reason, PlanId }, Variables[] }` — her iki kapsamın tamamı; restore, snapshot'tan üretilen sıradan bir plandır.
 - `Profile { Name, Operations[] }` — kaydedilmiş ChangePlan şablonu
 - `VaultSecret { Key, ProtectedValue, Tags[] }`
 
