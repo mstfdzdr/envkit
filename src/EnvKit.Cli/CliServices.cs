@@ -1,8 +1,10 @@
+using EnvKit.Core.Credentials;
 using EnvKit.Core.IO;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
+using EnvKit.Windows.Credentials;
 using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
 using EnvKit.Windows.Variables;
@@ -15,6 +17,9 @@ public interface IPrompt
     bool IsInteractive { get; }
 
     bool Confirm(string question);
+
+    /// <summary>Reads a secret without echoing it; <see langword="null"/> if input ended.</summary>
+    string? ReadSecret(string label);
 }
 
 internal sealed class ConsolePrompt : IPrompt
@@ -28,11 +33,40 @@ internal sealed class ConsolePrompt : IPrompt
         return string.Equals(answer, "y", StringComparison.OrdinalIgnoreCase)
             || string.Equals(answer, "yes", StringComparison.OrdinalIgnoreCase);
     }
+
+    public string? ReadSecret(string label)
+    {
+        Console.Write($"{label}: ");
+        var secret = new System.Text.StringBuilder();
+        while (true)
+        {
+            var key = Console.ReadKey(intercept: true);
+            if (key.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();
+                return secret.ToString();
+            }
+
+            if (key.Key == ConsoleKey.Backspace)
+            {
+                if (secret.Length > 0)
+                {
+                    secret.Length--;
+                }
+            }
+            else if (!char.IsControl(key.KeyChar))
+            {
+                secret.Append(key.KeyChar);
+            }
+        }
+    }
 }
 
 public sealed class CliServices
 {
     public required IEnvStore Store { get; init; }
+
+    public required ICredentialStore Credentials { get; init; }
 
     public required IFileSystem FileSystem { get; init; }
 
@@ -42,6 +76,9 @@ public sealed class CliServices
 
     /// <summary>Variables Windows supplies outside the registry; see <see cref="EnvLookup"/>.</summary>
     public required Func<string, string?> SystemFallback { get; init; }
+
+    /// <summary>Standard input, for <c>--password-stdin</c>.</summary>
+    public required TextReader In { get; init; }
 
     public required TextWriter Out { get; init; }
 
@@ -54,10 +91,12 @@ public sealed class CliServices
     public static CliServices CreateDefault() => new()
     {
         Store = new RegistryEnvStore(),
+        Credentials = new WindowsCredentialStore(),
         FileSystem = PhysicalFileSystem.Instance,
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
         Broadcaster = new SettingChangeBroadcaster(),
         SystemFallback = Environment.GetEnvironmentVariable,
+        In = Console.In,
         Out = Console.Out,
         Error = Console.Error,
         Prompt = new ConsolePrompt(),
@@ -68,7 +107,7 @@ public sealed class CliServices
 
     public PathReport AnalyzePath() => new PathAnalyzer(FileSystem).Analyze(Store, Lookup());
 
-    public PlanBuilder NewPlan() => new(Store);
+    public PlanBuilder NewPlan() => new(Store, Credentials);
 
-    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation);
+    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation, Credentials);
 }

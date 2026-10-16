@@ -14,6 +14,8 @@ public sealed class CliTests : IDisposable
 
     private readonly FakePrompt _prompt = new();
     private readonly StringWriter _output = new();
+    private readonly InMemoryCredentialStore _credentials = new();
+    private StringReader _input = new(string.Empty);
 
     public CliTests()
     {
@@ -21,7 +23,11 @@ public sealed class CliTests : IDisposable
         _store.Set(new EnvVariable("Path", @"C:\a;;C:\b;C:\A\", EnvScope.User, EnvValueKind.Expandable));
     }
 
-    public void Dispose() => _output.Dispose();
+    public void Dispose()
+    {
+        _output.Dispose();
+        _input.Dispose();
+    }
 
     private string Output => _output.ToString();
 
@@ -31,6 +37,8 @@ public sealed class CliTests : IDisposable
         new CliServices
         {
             Store = _store,
+            Credentials = _credentials,
+            In = _input,
             FileSystem = _fileSystem,
             Snapshots = _snapshots,
             Broadcaster = _broadcaster,
@@ -167,6 +175,8 @@ public sealed class CliTests : IDisposable
             new CliServices
             {
                 Store = store,
+                Credentials = _credentials,
+                In = _input,
                 FileSystem = _fileSystem,
                 Snapshots = _snapshots,
                 Broadcaster = _broadcaster,
@@ -193,6 +203,8 @@ public sealed class CliTests : IDisposable
             new CliServices
             {
                 Store = new MachineReadOnlyStore(_store),
+                Credentials = _credentials,
+                In = _input,
                 FileSystem = _fileSystem,
                 Snapshots = _snapshots,
                 Broadcaster = _broadcaster,
@@ -232,5 +244,9 @@ public sealed class CliTests : IDisposable
         public bool Answer { get; set; } = true;
 
         public bool Confirm(string question) => Answer;
+
+        public string? Secret { get; set; }
+
+        public string? ReadSecret(string label) => Secret;
     }
 }

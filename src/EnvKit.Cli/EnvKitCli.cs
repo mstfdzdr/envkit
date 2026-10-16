@@ -5,11 +5,12 @@ namespace EnvKit.Cli;
 
 public static class EnvKitCli
 {
-    public static RootCommand Create(CliServices services) => new("Manage Windows environment variables and PATH safely.")
+    public static RootCommand Create(CliServices services) => new("Manage Windows environment variables, PATH and credentials safely.")
     {
         PathCommands.Create(services),
         WhichCommand.Create(services),
         VarCommands.Create(services),
+        CredCommands.Create(services),
         SnapshotCommands.Create(services),
         ApplyPlanCommand.Create(services),
     };

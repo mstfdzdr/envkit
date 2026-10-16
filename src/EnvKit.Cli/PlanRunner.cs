@@ -52,9 +52,12 @@ internal sealed class PlanRunner(CliServices services)
             // Machine-scope changes trigger a UAC prompt here when this terminal is not elevated.
             var result = services.Executor().Execute(plan);
             output.WriteLine($"Applied. Undo with: envkit snapshot restore {result.Snapshot!.Id}");
-            output.WriteLine(result.Broadcast
-                ? "New terminals see the change; terminals that are already open keep their old environment."
-                : "Running programs could not be notified; sign out and back in to pick up the change.");
+            if (plan.Changes.Any(c => c is VariableChange))
+            {
+                output.WriteLine(result.Broadcast
+                    ? "New terminals see the change; terminals that are already open keep their old environment."
+                    : "Running programs could not be notified; sign out and back in to pick up the change.");
+            }
             return ExitCodes.Ok;
         }
         catch (OperationCanceledException ex)
