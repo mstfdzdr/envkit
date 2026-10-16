@@ -4,7 +4,9 @@ namespace EnvKit.Core.Credentials;
 public enum CredentialGroup
 {
     Git,
-    GitHub,
+
+    /// <summary>GitHub Desktop stores every host as "GitHub - &lt;url&gt;".</summary>
+    GitHubDesktop,
     VisualStudio,
     VSCode,
     Docker,
@@ -21,7 +23,7 @@ public static class CredentialClassifier
     private static readonly (CredentialGroup Group, Func<string, bool> Matches)[] Rules =
     [
         (CredentialGroup.Git, t => t.StartsWith("git:", StringComparison.OrdinalIgnoreCase)),
-        (CredentialGroup.GitHub, t => t.StartsWith("GitHub", StringComparison.OrdinalIgnoreCase)),
+        (CredentialGroup.GitHubDesktop, t => t.StartsWith("GitHub", StringComparison.OrdinalIgnoreCase)),
         (CredentialGroup.VSCode, t => t.StartsWith("vscode", StringComparison.OrdinalIgnoreCase)),
         (CredentialGroup.VisualStudio, t => Contains(t, "VisualStudio") || t.StartsWith("VSCredentials", StringComparison.OrdinalIgnoreCase)),
         (CredentialGroup.Docker, t => Contains(t, "docker")),

@@ -59,7 +59,7 @@ public class CredentialTests
 
     [Theory]
     [InlineData("git:https://github.com", CredentialKind.Generic, CredentialGroup.Git)]
-    [InlineData("GitHub - https://api.github.com/me", CredentialKind.Generic, CredentialGroup.GitHub)]
+    [InlineData("GitHub - https://api.github.com/me", CredentialKind.Generic, CredentialGroup.GitHubDesktop)]
     [InlineData("vscodevscode.github-authentication/github.auth", CredentialKind.Generic, CredentialGroup.VSCode)]
     [InlineData("VSCredentials_me", CredentialKind.Generic, CredentialGroup.VisualStudio)]
     [InlineData("https://index.docker.io/v1/docker", CredentialKind.Generic, CredentialGroup.Docker)]

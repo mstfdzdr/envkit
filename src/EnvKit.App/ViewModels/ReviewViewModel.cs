@@ -14,6 +14,9 @@ public sealed partial class ReviewViewModel(ChangePlan plan, MainViewModel main)
 
     public bool RequiresElevation => Plan.RequiresElevation;
 
+    /// <summary>Some deletions (domain credentials) cannot be restored from the snapshot.</summary>
+    public bool HasIrreversibleChanges => Plan.Changes.Any(c => c is CredentialChange { After: null, IsIrreversible: true });
+
     [RelayCommand]
     private Task ApplyAsync() => main.ApplyAsync(Plan);
 

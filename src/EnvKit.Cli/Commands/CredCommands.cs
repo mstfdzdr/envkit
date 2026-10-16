@@ -23,7 +23,7 @@ internal static class CredCommands
 
     private static Option<CredentialGroup?> Group() => new("--group", "-g")
     {
-        Description = "Only credentials of one tool: Git, GitHub, VisualStudio, VSCode, Docker, RemoteDesktop, MicrosoftAccount, Office, Network, Other.",
+        Description = "Only credentials of one tool: Git, GitHubDesktop, VisualStudio, VSCode, Docker, RemoteDesktop, MicrosoftAccount, Office, Network, Other.",
     };
 
     private static Option<CredentialKind> Kind() => new("--type", "-t")

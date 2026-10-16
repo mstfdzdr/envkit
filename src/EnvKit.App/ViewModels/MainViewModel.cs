@@ -25,14 +25,17 @@ public sealed partial class MainViewModel : ObservableObject
         _services = services;
         Variables = new VariablesViewModel(services, this);
         Path = new PathViewModel(services, this);
+        Credentials = new CredentialsViewModel(services, this);
         History = new HistoryViewModel(services, this);
-        Pages = [Path, Variables, History];
+        Pages = [Path, Variables, Credentials, History];
         SelectedPage = Path;
     }
 
     public VariablesViewModel Variables { get; }
 
     public PathViewModel Path { get; }
+
+    public CredentialsViewModel Credentials { get; }
 
     public HistoryViewModel History { get; }
 
@@ -112,10 +115,13 @@ public sealed partial class MainViewModel : ObservableObject
         {
             // The UAC prompt and the broadcast both block; keep the UI thread free.
             var result = await Task.Run(() => _services.Executor().Execute(plan));
+            var propagation = plan.Changes.Any(c => c is VariableChange)
+                ? " New terminals see the change, open ones keep their old environment."
+                : string.Empty;
             ShowStatus(
                 InfoBarSeverity.Success,
                 "Changes applied",
-                $"Snapshot {result.Snapshot!.Id} saved; restore it from History. New terminals see the change, open ones keep their old environment.");
+                $"Snapshot {result.Snapshot!.Id} saved; restore it from History.{propagation}");
         }
         catch (OperationCanceledException ex)
         {

@@ -10,6 +10,7 @@ namespace EnvKit.App.Tests;
 public class ViewModelTests
 {
     private readonly InMemoryEnvStore _store = new();
+    private readonly InMemoryCredentialStore _credentials = new();
     private readonly InMemorySnapshotStore _snapshots = new();
     private readonly CountingBroadcaster _broadcaster = new();
 
@@ -24,6 +25,7 @@ public class ViewModelTests
     {
         Updater = updater,
         Store = store ?? _store,
+        Credentials = _credentials,
         FileSystem = new FakeFileSystem().WithDirectories(@"C:\Windows", @"C:\a", @"C:\b"),
         Snapshots = _snapshots,
         Broadcaster = _broadcaster,

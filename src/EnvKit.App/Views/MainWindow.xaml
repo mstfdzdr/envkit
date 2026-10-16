@@ -24,6 +24,9 @@
     <DataTemplate DataType="{x:Type vm:VariablesViewModel}">
       <views:VariablesView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CredentialsViewModel}">
+      <views:CredentialsView />
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
       <views:HistoryView />
     </DataTemplate>
@@ -149,11 +152,14 @@
             </ItemsControl>
           </ScrollViewer>
 
-          <TextBlock Grid.Row="3"
-                     Margin="0,8,0,0"
-                     Style="{StaticResource Problem}"
-                     Text="Includes machine-scope changes: Windows will ask for administrator approval."
-                     Visibility="{Binding RequiresElevation, Converter={StaticResource BoolToVisibility}}" />
+          <StackPanel Grid.Row="3" Margin="0,8,0,0">
+            <TextBlock Style="{StaticResource Problem}"
+                       Text="Includes machine-scope changes: Windows will ask for administrator approval."
+                       Visibility="{Binding RequiresElevation, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock Style="{StaticResource Problem}" FontWeight="SemiBold"
+                       Text="Some deletions cannot be undone: Windows never reveals the secret of domain credentials."
+                       Visibility="{Binding HasIrreversibleChanges, Converter={StaticResource BoolToVisibility}}" />
+          </StackPanel>
 
           <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <ui:Button Content="Cancel" Command="{Binding CancelCommand}" Margin="0,0,8,0" MinWidth="96" />
