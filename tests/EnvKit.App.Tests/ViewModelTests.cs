@@ -19,13 +19,14 @@ public class ViewModelTests
         _store.Set(new EnvVariable("GITHUB_TOKEN", "ghp_secret", EnvScope.User));
     }
 
-    private MainViewModel CreateMain(IEnvStore? store = null) => new(new AppServices
+    private MainViewModel CreateMain(IEnvStore? store = null, FakeElevation? elevation = null) => new(new AppServices
     {
         Store = store ?? _store,
         FileSystem = new FakeFileSystem().WithDirectories(@"C:\Windows", @"C:\a", @"C:\b"),
         Snapshots = _snapshots,
         Broadcaster = _broadcaster,
         SystemFallback = _ => null,
+        Elevation = elevation ?? new FakeElevation(_store) { IsElevated = true },
     });
 
     private string UserPath => _store.Get("Path", EnvScope.User)!.Value;
@@ -127,6 +128,25 @@ public class ViewModelTests
         await main.Review.ApplyCommand.ExecuteAsync(null);
 
         Assert.Equal(InfoBarSeverity.Error, main.StatusSeverity);
+        Assert.Equal(@"C:\Windows", _store.Get("Path", EnvScope.Machine)!.Value);
+    }
+
+    [Fact]
+    public async Task Declined_UAC_prompt_is_reported_as_cancelled_and_reverts_user_changes()
+    {
+        var elevation = new FakeElevation(_store) { Failure = new OperationCanceledException("declined") };
+        var main = CreateMain(new MachineReadOnlyStore(_store), elevation);
+        main.Path.FixProblemsCommand.Execute(null);
+        main.Path.Scope = EnvScope.Machine;
+        main.Path.NewEntry = @"C:\tools";
+        main.Path.AddCommand.Execute(null);
+        main.Path.SaveCommand.Execute(null);
+
+        await main.Review!.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Single(elevation.Requests);
+        Assert.Equal(InfoBarSeverity.Warning, main.StatusSeverity);
+        Assert.Equal(@"C:\a;;C:\b;C:\a", UserPath);
         Assert.Equal(@"C:\Windows", _store.Get("Path", EnvScope.Machine)!.Value);
     }
 

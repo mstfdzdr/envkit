@@ -2,6 +2,7 @@ using EnvKit.Core.IO;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
+using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
 using EnvKit.Windows.Variables;
 
@@ -20,6 +21,8 @@ public sealed class AppServices
     /// <summary>Variables Windows supplies outside the registry; see <see cref="EnvLookup"/>.</summary>
     public required Func<string, string?> SystemFallback { get; init; }
 
+    public required IElevation Elevation { get; init; }
+
     public static AppServices CreateDefault() => new()
     {
         Store = new RegistryEnvStore(),
@@ -27,11 +30,12 @@ public sealed class AppServices
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
         Broadcaster = new SettingChangeBroadcaster(),
         SystemFallback = Environment.GetEnvironmentVariable,
+        Elevation = WindowsElevation.ForCurrentProcess(),
     };
 
     public EnvLookup Lookup() => new(Store, SystemFallback);
 
     public PlanBuilder NewPlan() => new(Store);
 
-    public PlanApplier Applier() => new(Store, Snapshots, Broadcaster);
+    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation);
 }

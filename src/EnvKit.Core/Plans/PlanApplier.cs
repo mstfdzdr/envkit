@@ -3,11 +3,17 @@ using EnvKit.Core.Variables;
 
 namespace EnvKit.Core.Plans;
 
-/// <param name="Snapshot">Taken before the first write; <see langword="null"/> for an empty plan.</param>
+/// <param name="Snapshot">Taken before the first write; <see langword="null"/> for an empty plan or when not snapshotting.</param>
 /// <param name="Broadcast">Whether running programs were notified.</param>
 public sealed record PlanResult(SnapshotInfo? Snapshot, bool Broadcast);
 
-public sealed class PlanApplier(IEnvStore store, ISnapshotStore snapshots, IEnvChangeBroadcaster broadcaster, TimeProvider? timeProvider = null)
+/// <param name="snapshots"><see langword="null"/> to skip the snapshot (the elevated helper: its caller already took one).</param>
+/// <param name="broadcaster"><see langword="null"/> to leave notifying to the caller.</param>
+public sealed class PlanApplier(
+    IEnvStore store,
+    ISnapshotStore? snapshots,
+    IEnvChangeBroadcaster? broadcaster,
+    TimeProvider? timeProvider = null)
 {
     /// <summary>
     /// Checks every precondition, snapshots the current state, writes the changes and
@@ -24,16 +30,35 @@ public sealed class PlanApplier(IEnvStore store, ISnapshotStore snapshots, IEnvC
             return new PlanResult(null, Broadcast: false);
         }
 
-        var changes = plan.Changes.Cast<VariableChange>().ToList();
+        var changes = VariableChanges(plan);
+        EnsureCurrent(changes);
+
+        SnapshotInfo? snapshot = null;
+        if (snapshots is not null)
+        {
+            var captured = Snapshot.Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider);
+            snapshots.Save(captured);
+            snapshot = captured.Info;
+        }
+
+        WriteAll(changes, snapshot);
+        return new PlanResult(snapshot, broadcaster?.Broadcast() ?? false);
+    }
+
+    /// <exception cref="PlanConflictException">Some changes no longer match the store.</exception>
+    public void EnsureCurrent(IEnumerable<VariableChange> changes)
+    {
         var conflicts = changes.Where(c => Current(c) != c.Before).ToList();
         if (conflicts.Count > 0)
         {
             throw new PlanConflictException(conflicts);
         }
+    }
 
-        var snapshot = Snapshot.Capture(store, $"Before: {plan.Description}", plan.Id, timeProvider);
-        snapshots.Save(snapshot);
-
+    /// <summary>Writes in order; if one write fails, the earlier ones are reverted before rethrowing.</summary>
+    public void WriteAll(IReadOnlyList<VariableChange> changes, SnapshotInfo? snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(changes);
         var applied = new List<VariableChange>();
         try
         {
@@ -45,16 +70,32 @@ public sealed class PlanApplier(IEnvStore store, ISnapshotStore snapshots, IEnvC
         }
         catch (Exception failure)
         {
-            var rollbackFailures = Revert(applied);
+            var rollbackFailures = TryRevert(applied);
             if (rollbackFailures.Count > 0)
             {
-                throw new PlanApplyException(snapshot.Info, new AggregateException([failure, .. rollbackFailures]));
+                throw new PlanApplyException(snapshot, new AggregateException([failure, .. rollbackFailures]));
             }
 
             throw;
         }
+    }
 
-        return new PlanResult(snapshot.Info, broadcaster.Broadcast());
+    /// <summary>Puts every change's before state back, newest first.</summary>
+    /// <exception cref="AggregateException">Some changes could not be reverted.</exception>
+    public void RevertAll(IReadOnlyList<VariableChange> changes)
+    {
+        ArgumentNullException.ThrowIfNull(changes);
+        var failures = TryRevert(changes);
+        if (failures.Count > 0)
+        {
+            throw new AggregateException(failures);
+        }
+    }
+
+    public static List<VariableChange> VariableChanges(ChangePlan plan)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+        return [.. plan.Changes.Cast<VariableChange>()];
     }
 
     private VariableValue? Current(VariableChange change) =>
@@ -72,7 +113,7 @@ public sealed class PlanApplier(IEnvStore store, ISnapshotStore snapshots, IEnvC
         }
     }
 
-    private List<Exception> Revert(List<VariableChange> applied)
+    private List<Exception> TryRevert(IReadOnlyList<VariableChange> applied)
     {
         var failures = new List<Exception>();
         for (var i = applied.Count - 1; i >= 0; i--)
@@ -113,11 +154,15 @@ public sealed class PlanConflictException : Exception
     public IReadOnlyList<VariableChange> Conflicts { get; }
 }
 
-/// <summary>The plan is partially applied; <see cref="Snapshot"/> restores the state before it.</summary>
+/// <summary>The plan is partially applied; <see cref="Snapshot"/>, when present, restores the state before it.</summary>
 public sealed class PlanApplyException : Exception
 {
-    public PlanApplyException(SnapshotInfo snapshot, Exception innerException)
-        : base($"The plan was partially applied and could not be reverted. Restore snapshot {snapshot.Id}.", innerException) =>
+    public PlanApplyException(SnapshotInfo? snapshot, Exception innerException)
+        : base(
+            snapshot is null
+                ? "The plan was partially applied and could not be reverted."
+                : $"The plan was partially applied and could not be reverted. Restore snapshot {snapshot.Id}.",
+            innerException) =>
         Snapshot = snapshot;
 
     public PlanApplyException()

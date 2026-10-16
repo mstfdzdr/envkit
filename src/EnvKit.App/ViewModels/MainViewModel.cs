@@ -80,16 +80,24 @@ public sealed partial class MainViewModel : ObservableObject
     {
         try
         {
-            // The broadcast can wait on unresponsive windows; keep the UI thread free.
-            var result = await Task.Run(() => _services.Applier().Apply(plan));
+            // The UAC prompt and the broadcast both block; keep the UI thread free.
+            var result = await Task.Run(() => _services.Executor().Execute(plan));
             ShowStatus(
                 InfoBarSeverity.Success,
                 "Changes applied",
                 $"Snapshot {result.Snapshot!.Id} saved; restore it from History. New terminals see the change, open ones keep their old environment.");
         }
+        catch (OperationCanceledException ex)
+        {
+            ShowStatus(InfoBarSeverity.Warning, "Cancelled", ex.Message);
+        }
         catch (ElevationRequiredException)
         {
             ShowStatus(InfoBarSeverity.Error, "Administrator rights needed", "Machine-scope changes need administrator rights. Nothing was changed.");
+        }
+        catch (ElevatedApplyException ex)
+        {
+            ShowStatus(InfoBarSeverity.Error, "Machine changes failed", $"{ex.Message} User-scope changes from this plan were reverted.");
         }
         catch (PlanConflictException ex)
         {

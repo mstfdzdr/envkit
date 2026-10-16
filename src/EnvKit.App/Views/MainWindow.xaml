@@ -142,7 +142,7 @@
           <TextBlock Grid.Row="3"
                      Margin="0,8,0,0"
                      Style="{StaticResource Problem}"
-                     Text="Includes machine-scope changes, which need administrator rights."
+                     Text="Includes machine-scope changes: Windows will ask for administrator approval."
                      Visibility="{Binding RequiresElevation, Converter={StaticResource BoolToVisibility}}" />
 
           <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">

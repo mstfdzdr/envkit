@@ -3,6 +3,7 @@ using EnvKit.Core.Paths;
 using EnvKit.Core.Plans;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
+using EnvKit.Windows.Elevation;
 using EnvKit.Windows.Security;
 using EnvKit.Windows.Variables;
 
@@ -48,6 +49,8 @@ public sealed class CliServices
 
     public required IPrompt Prompt { get; init; }
 
+    public required IElevation Elevation { get; init; }
+
     public static CliServices CreateDefault() => new()
     {
         Store = new RegistryEnvStore(),
@@ -58,6 +61,7 @@ public sealed class CliServices
         Out = Console.Out,
         Error = Console.Error,
         Prompt = new ConsolePrompt(),
+        Elevation = WindowsElevation.ForCurrentProcess(),
     };
 
     public EnvLookup Lookup() => new(Store, SystemFallback);
@@ -66,5 +70,5 @@ public sealed class CliServices
 
     public PlanBuilder NewPlan() => new(Store);
 
-    public PlanApplier Applier() => new(Store, Snapshots, Broadcaster);
+    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation);
 }

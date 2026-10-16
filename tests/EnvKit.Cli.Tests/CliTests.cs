@@ -38,6 +38,7 @@ public sealed class CliTests : IDisposable
             Out = _output,
             Error = _output,
             Prompt = _prompt,
+            Elevation = new FakeElevation(_store) { IsElevated = true },
         },
         args);
 
@@ -173,12 +174,39 @@ public sealed class CliTests : IDisposable
                 Out = _output,
                 Error = _output,
                 Prompt = _prompt,
+                Elevation = new FakeElevation(_store) { IsElevated = true },
             },
             ["var", "set", "M", "1", "--scope", "machine", "--yes"]);
 
         Assert.Equal(3, exit);
         Assert.Contains("administrator", Output, StringComparison.Ordinal);
         Assert.Null(_store.Get("M", EnvScope.Machine));
+    }
+
+    [Theory]
+    [InlineData(false, 0)]
+    [InlineData(true, 5)]
+    public void Unelevated_terminal_applies_machine_changes_through_the_helper(bool declined, int expectedExit)
+    {
+        var elevation = new FakeElevation(_store) { Failure = declined ? new OperationCanceledException("declined") : null };
+        var exit = EnvKitCli.Run(
+            new CliServices
+            {
+                Store = new MachineReadOnlyStore(_store),
+                FileSystem = _fileSystem,
+                Snapshots = _snapshots,
+                Broadcaster = _broadcaster,
+                SystemFallback = _ => null,
+                Out = _output,
+                Error = _output,
+                Prompt = _prompt,
+                Elevation = elevation,
+            },
+            ["var", "set", "M", "1", "--scope", "machine", "--yes"]);
+
+        Assert.Equal(expectedExit, exit);
+        Assert.Single(elevation.Requests);
+        Assert.Equal(declined ? null : "1", _store.Get("M", EnvScope.Machine)?.Value);
     }
 
     [Fact]

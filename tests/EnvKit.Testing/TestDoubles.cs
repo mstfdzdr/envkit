@@ -1,4 +1,5 @@
 using EnvKit.Core;
+using EnvKit.Core.Plans;
 using EnvKit.Core.Security;
 using EnvKit.Core.Snapshots;
 using EnvKit.Core.Variables;
@@ -50,6 +51,31 @@ public sealed class XorProtector : ISecretProtector
     {
         Calls++;
         return [.. data.Select(b => (byte)(b ^ 0x5A))];
+    }
+}
+
+/// <summary>
+/// Stands in for the UAC helper: applies machine plans straight to <paramref name="helperStore"/>,
+/// which should bypass any <see cref="MachineReadOnlyStore"/> the caller uses.
+/// </summary>
+public sealed class FakeElevation(IEnvStore helperStore) : IElevation
+{
+    public bool IsElevated { get; set; }
+
+    public List<ChangePlan> Requests { get; } = [];
+
+    /// <summary>Thrown instead of applying, e.g. <see cref="OperationCanceledException"/> for a declined prompt.</summary>
+    public Exception? Failure { get; set; }
+
+    public void ApplyElevated(ChangePlan machinePlan)
+    {
+        Requests.Add(machinePlan);
+        if (Failure is not null)
+        {
+            throw Failure;
+        }
+
+        new PlanApplier(helperStore, snapshots: null, broadcaster: null).Apply(machinePlan);
     }
 }
 

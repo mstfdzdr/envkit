@@ -49,18 +49,28 @@ internal sealed class PlanRunner(CliServices services)
 
         try
         {
-            var result = services.Applier().Apply(plan);
+            // Machine-scope changes trigger a UAC prompt here when this terminal is not elevated.
+            var result = services.Executor().Execute(plan);
             output.WriteLine($"Applied. Undo with: envkit snapshot restore {result.Snapshot!.Id}");
             output.WriteLine(result.Broadcast
                 ? "New terminals see the change; terminals that are already open keep their old environment."
                 : "Running programs could not be notified; sign out and back in to pick up the change.");
             return ExitCodes.Ok;
         }
+        catch (OperationCanceledException ex)
+        {
+            services.Error.WriteLine(ex.Message);
+            return ExitCodes.Aborted;
+        }
         catch (ElevationRequiredException)
         {
             services.Error.WriteLine("Machine-scope changes need administrator rights. Nothing was changed.");
-            services.Error.WriteLine("Run the command again from an elevated terminal.");
             return ExitCodes.ElevationRequired;
+        }
+        catch (ElevatedApplyException ex)
+        {
+            services.Error.WriteLine($"{ex.Message} User-scope changes from this plan were reverted.");
+            return ExitCodes.Error;
         }
         catch (PlanConflictException ex)
         {

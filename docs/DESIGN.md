@@ -56,7 +56,12 @@ Kazanımlar: CLI'de `--dry-run` bedava, her zaman geri alınabilirlik, elevation
           └───────────────┘
 ```
 
-**Elevation:** Uygulama asla bütünüyle admin çalışmaz. System kapsamlı değişiklik gerekiyorsa plan JSON olarak yazılır ve aynı exe `envkit apply-plan <dosya>` ile `runas` üzerinden kısa ömürlü elevated process olarak çalıştırılır; yalnızca o planı uygulayıp çıkar.
+**Elevation:** Uygulama asla bütünüyle admin çalışmaz. System kapsamlı değişiklik gerekiyorsa plan JSON olarak yazılır ve aynı exe `apply-plan <dosya> --sha256 <hash>` ile `runas` üzerinden kısa ömürlü elevated process olarak çalıştırılır; yalnızca o planı uygulayıp çıkar. Ayrıntılar (`PlanExecutor`, `WindowsElevation`, `ElevatedPlanHost`):
+
+- Elevated process **yalnızca Machine** değişikliklerini uygular; User değişikliklerini normal process yazar. (UAC'de başka bir admin hesabı kullanılırsa elevated process'in HKCU'su o admin'e aittir.)
+- Sıra: ön koşul kontrolü (UAC'den önce) → snapshot (normal process; DPAPI anahtarı kullanıcınınki) → User değişiklikleri → UAC + Machine değişiklikleri. UAC reddedilir veya helper başarısız olursa User değişiklikleri admin gerekmeden geri alınır.
+- Plan dosyası `%LOCALAPPDATA%\EnvKit\plans` altında; helper onu bir kez belleğe okur ve komut satırındaki SHA-256 ile doğrular (UAC onayı ile okuma arasında dosyanın değiştirilmesine karşı).
+- Helper kullanıcı klasörüne hiçbir şey yazmaz; sonucu yalnızca çıkış koduyla bildirir (symlink/junction ile ayrıcalık yükseltmeye karşı).
 
 ## Kritik teknik detaylar
 

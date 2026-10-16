@@ -11,6 +11,7 @@ public static class EnvKitCli
         WhichCommand.Create(services),
         VarCommands.Create(services),
         SnapshotCommands.Create(services),
+        ApplyPlanCommand.Create(services),
     };
 
     public static int Run(CliServices services, string[] args)
