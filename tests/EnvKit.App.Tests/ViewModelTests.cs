@@ -29,6 +29,8 @@ public class ViewModelTests
         Vault = new InMemoryVault(),
         Profiles = new InMemoryProfileStore(),
         FileSystem = new FakeFileSystem().WithDirectories(@"C:\Windows", @"C:\a", @"C:\b"),
+        Files = new InMemoryFileStore(),
+        Git = new NoGit(),
         Snapshots = _snapshots,
         Broadcaster = _broadcaster,
         SystemFallback = _ => null,
@@ -196,6 +198,15 @@ public class ViewModelTests
         Assert.Equal("ghp_secret", variables.Selected!.DisplayValue);
         Assert.False(variables.IsValueHidden);
         Assert.True(variables.SaveCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Variable_rows_never_expose_values_through_ToString()
+    {
+        var variables = CreateMain().Variables;
+
+        Assert.All(variables.Variables, v => Assert.DoesNotContain("ghp_secret", v.ToString(), StringComparison.Ordinal));
+        Assert.DoesNotContain("ghp_secret", _store.Get("GITHUB_TOKEN", EnvScope.User)!.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

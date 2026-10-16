@@ -15,8 +15,12 @@ public static class SecretDetector
     private static readonly string[] NameFragments =
     [
         "TOKEN", "SECRET", "PASSWORD", "PASSWD", "PWD", "APIKEY", "ACCESSKEY",
-        "PRIVATEKEY", "CREDENTIAL", "CONNECTIONSTRING", "CONNSTR",
+        "PRIVATEKEY", "CREDENTIAL", "CONNECTIONSTRING", "CONNSTR", "DSN",
     ];
+
+    // scheme://user:password@host — common in DATABASE_URL, REDIS_URL and the like.
+    private static readonly System.Text.RegularExpressions.Regex UrlWithPassword =
+        new(@"^[A-Za-z][A-Za-z0-9+.\-]*://[^/\s:@]*:[^/\s@]+@", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
     private static readonly string[] NameSuffixes = ["_KEY", "_PAT", "_PASS", "_AUTH"];
 
@@ -36,6 +40,7 @@ public static class SecretDetector
         return upper is "PAT" or "KEY"
             || NameFragments.Any(f => compact.Contains(f, StringComparison.Ordinal))
             || NameSuffixes.Any(s => upper.EndsWith(s, StringComparison.Ordinal))
-            || ValuePrefixes.Any(p => value.StartsWith(p, StringComparison.Ordinal));
+            || ValuePrefixes.Any(p => value.StartsWith(p, StringComparison.Ordinal))
+            || UrlWithPassword.IsMatch(value);
     }
 }

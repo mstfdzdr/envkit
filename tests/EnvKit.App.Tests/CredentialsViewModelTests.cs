@@ -29,6 +29,8 @@ public class CredentialsViewModelTests
             Vault = new InMemoryVault(),
             Profiles = new InMemoryProfileStore(),
             FileSystem = new FakeFileSystem(),
+            Files = new InMemoryFileStore(),
+            Git = new NoGit(),
             Snapshots = _snapshots,
             Broadcaster = new CountingBroadcaster(),
             SystemFallback = _ => null,

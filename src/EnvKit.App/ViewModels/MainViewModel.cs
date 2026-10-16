@@ -1,3 +1,4 @@
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EnvKit.Core;
@@ -28,8 +29,9 @@ public sealed partial class MainViewModel : ObservableObject
         Credentials = new CredentialsViewModel(services, this);
         Profiles = new ProfilesViewModel(services, this);
         Vault = new VaultViewModel(services, this);
+        ProjectSecrets = new ProjectSecretsViewModel(services, this);
         History = new HistoryViewModel(services, this);
-        Pages = [Path, Variables, Credentials, Profiles, Vault, History];
+        Pages = [Path, Variables, Credentials, Profiles, Vault, ProjectSecrets, History];
         SelectedPage = Path;
     }
 
@@ -42,6 +44,8 @@ public sealed partial class MainViewModel : ObservableObject
     public ProfilesViewModel Profiles { get; }
 
     public VaultViewModel Vault { get; }
+
+    public ProjectSecretsViewModel ProjectSecrets { get; }
 
     public HistoryViewModel History { get; }
 
@@ -95,7 +99,8 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void RestartToUpdate() => _services.Updater?.ApplyAndRestart();
 
-    public void RequestReview(ChangePlan plan)
+    /// <param name="beforeApply">Runs once the user confirms, right before the plan is applied.</param>
+    public void RequestReview(ChangePlan plan, Action? beforeApply = null)
     {
         ArgumentNullException.ThrowIfNull(plan);
         if (plan.IsEmpty)
@@ -104,7 +109,7 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        Review = new ReviewViewModel(plan, this);
+        Review = new ReviewViewModel(plan, this, beforeApply);
     }
 
     public void ShowStatus(InfoBarSeverity severity, string title, string message)
@@ -115,8 +120,19 @@ public sealed partial class MainViewModel : ObservableObject
         IsStatusOpen = true;
     }
 
-    internal async Task ApplyAsync(ChangePlan plan)
+    internal async Task ApplyAsync(ChangePlan plan, Action? beforeApply = null)
     {
+        try
+        {
+            beforeApply?.Invoke();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException)
+        {
+            ShowStatus(InfoBarSeverity.Error, "Nothing was changed", ex.Message);
+            Review = null;
+            return;
+        }
+
         try
         {
             // The UAC prompt and the broadcast both block; keep the UI thread free.

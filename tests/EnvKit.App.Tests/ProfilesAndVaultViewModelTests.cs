@@ -25,6 +25,8 @@ public class ProfilesAndVaultViewModelTests
             Vault = _vault,
             Profiles = _profiles,
             FileSystem = new FakeFileSystem(),
+            Files = new InMemoryFileStore(),
+            Git = new NoGit(),
             Snapshots = _snapshots,
             Broadcaster = new CountingBroadcaster(),
             SystemFallback = _ => null,

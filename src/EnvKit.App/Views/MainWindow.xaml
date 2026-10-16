@@ -33,6 +33,9 @@
     <DataTemplate DataType="{x:Type vm:VaultViewModel}">
       <views:VaultView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ProjectSecretsViewModel}">
+      <views:ProjectSecretsView />
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:HistoryViewModel}">
       <views:HistoryView />
     </DataTemplate>

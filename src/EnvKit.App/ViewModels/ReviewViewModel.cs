@@ -4,7 +4,7 @@ using EnvKit.Core.Plans;
 
 namespace EnvKit.App.ViewModels;
 
-public sealed partial class ReviewViewModel(ChangePlan plan, MainViewModel main) : ObservableObject
+public sealed partial class ReviewViewModel(ChangePlan plan, MainViewModel main, Action? beforeApply = null) : ObservableObject
 {
     public ChangePlan Plan { get; } = plan;
 
@@ -18,7 +18,7 @@ public sealed partial class ReviewViewModel(ChangePlan plan, MainViewModel main)
     public bool HasIrreversibleChanges => Plan.Changes.Any(c => c is CredentialChange { After: null, IsIrreversible: true });
 
     [RelayCommand]
-    private Task ApplyAsync() => main.ApplyAsync(Plan);
+    private Task ApplyAsync() => main.ApplyAsync(Plan, beforeApply);
 
     [RelayCommand]
     private void Cancel() => main.Review = null;

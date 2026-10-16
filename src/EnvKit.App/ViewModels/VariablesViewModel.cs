@@ -14,6 +14,9 @@ public sealed record VariableRow(EnvVariable Variable, bool IsSecret, bool Revea
     public string DisplayValue => IsSecret && !Reveal ? SecretDetector.Mask : Variable.Value;
 
     public EnvValueKind Kind => Variable.Kind;
+
+    /// <summary>The row's UI Automation name: never the value, which may be a masked secret.</summary>
+    public override string ToString() => Name;
 }
 
 public sealed partial class VariablesViewModel : PageViewModel

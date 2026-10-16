@@ -15,6 +15,9 @@ public class SecretDetectorTests
     [InlineData("NUGET_AUTH", "x")]
     [InlineData("WHATEVER", "ghp_abc")]
     [InlineData("WHATEVER", "sk-abc")]
+    [InlineData("DATABASE_URL", "postgres://app:hunter2@db:5432/app")]
+    [InlineData("REDIS_URL", "redis://:hunter2@cache:6379")]
+    [InlineData("SENTRY_DSN", "https://abc@o1.ingest.sentry.io/1")]
     public void Flags_credentials_by_name_or_value(string name, string value) =>
         Assert.True(SecretDetector.LooksSecret(name, value));
 
@@ -26,6 +29,8 @@ public class SecretDetectorTests
     [InlineData("SPARK_BASE_URL", "http://localhost:8090")]
     [InlineData("NUMBER_OF_PROCESSORS", "16")]
     [InlineData("GIT_AUTHOR_NAME", "me")]
+    [InlineData("DATABASE_URL", "postgres://db:5432/app")]
+    [InlineData("API_BASE", "https://user@example.com/path")]
     public void Leaves_ordinary_variables_alone(string name, string value) =>
         Assert.False(SecretDetector.LooksSecret(name, value));
 }

@@ -61,6 +61,9 @@ public sealed record EnvVariable
         }
     }
 
+    /// <summary>Never includes the value, which may be a secret; this ends up in logs and UI automation names.</summary>
+    public override string ToString() => $@"{Scope}\{Name}";
+
     public static void ValidateName(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
