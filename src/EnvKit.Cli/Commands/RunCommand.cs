@@ -13,6 +13,10 @@ internal static class RunCommand
         {
             Description = "NAME or NAME=SECRET: set variable NAME to a vault secret (named NAME unless given).",
         };
+        var envFiles = new Option<string[]>("--env-file", "-e")
+        {
+            Description = ".env file to load after the profiles; ${vault:NAME} values are filled in. Repeatable.",
+        };
         var commandLine = new Argument<string[]>("command")
         {
             Arity = ArgumentArity.OneOrMore,
@@ -22,7 +26,7 @@ internal static class RunCommand
             "run",
             "Run a command with profiles and vault secrets applied to its environment only. Nothing is written to the persistent environment. Example: envkit run -p java21 -s GITHUB_TOKEN -- mvn package")
         {
-            profiles, secrets, commandLine,
+            profiles, envFiles, secrets, commandLine,
         };
         command.SetAction(result =>
         {
@@ -41,6 +45,19 @@ internal static class RunCommand
             try
             {
                 environment = ProfileEnvironment.Apply(services.ProcessEnvironment(), selected, services.Vault);
+                foreach (var file in result.GetValue(envFiles) ?? [])
+                {
+                    if (DotEnvCommands.Load(services, file) is not { } document)
+                    {
+                        return ExitCodes.Error;
+                    }
+
+                    foreach (var (key, value) in document.Values())
+                    {
+                        environment[key] = VaultReference.Resolve(value, services.Vault);
+                    }
+                }
+
                 foreach (var spec in result.GetValue(secrets) ?? [])
                 {
                     var separator = spec.IndexOf('=', StringComparison.Ordinal);

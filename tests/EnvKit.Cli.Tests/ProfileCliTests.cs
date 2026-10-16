@@ -40,6 +40,8 @@ public sealed class ProfileCliTests : IDisposable
                     ["PATHEXT"] = ".EXE;.CMD",
                 },
                 FileSystem = _fileSystem,
+                Files = new InMemoryFileStore(),
+                Git = new NoGit(),
                 Snapshots = _snapshots,
                 Broadcaster = new CountingBroadcaster(),
                 SystemFallback = _ => null,

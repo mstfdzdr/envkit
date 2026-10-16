@@ -1,4 +1,5 @@
 using EnvKit.Core.Credentials;
+using EnvKit.Core.DotEnv;
 using EnvKit.Core.IO;
 using EnvKit.Core.Paths;
 using EnvKit.Core.Plans;
@@ -81,6 +82,11 @@ public sealed class CliServices
 
     public required IFileSystem FileSystem { get; init; }
 
+    /// <summary>Reads and atomically writes .env and secrets.json files.</summary>
+    public required IFileStore Files { get; init; }
+
+    public required IGitInspector Git { get; init; }
+
     public required ISnapshotStore Snapshots { get; init; }
 
     public required IEnvChangeBroadcaster Broadcaster { get; init; }
@@ -108,6 +114,8 @@ public sealed class CliServices
         Processes = new ProcessRunner(),
         ProcessEnvironment = ProcessRunner.CurrentEnvironment,
         FileSystem = PhysicalFileSystem.Instance,
+        Files = PhysicalFileStore.Instance,
+        Git = new GitInspector(),
         Snapshots = new FileSnapshotStore(FileSnapshotStore.DefaultDirectory, new DpapiProtector()),
         Broadcaster = new SettingChangeBroadcaster(),
         SystemFallback = Environment.GetEnvironmentVariable,
@@ -122,7 +130,7 @@ public sealed class CliServices
 
     public PathReport AnalyzePath() => new PathAnalyzer(FileSystem).Analyze(Store, Lookup());
 
-    public PlanBuilder NewPlan() => new(Store, Credentials);
+    public PlanBuilder NewPlan() => new(Store, Credentials, Files);
 
-    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation, Credentials);
+    public PlanExecutor Executor() => new(Store, Snapshots, Broadcaster, Elevation, Credentials, Files);
 }

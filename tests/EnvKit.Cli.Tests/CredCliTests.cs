@@ -40,6 +40,8 @@ public sealed class CredCliTests : IDisposable
                 Processes = new RecordingProcessRunner(),
                 ProcessEnvironment = () => new Dictionary<string, string>(),
                 FileSystem = new FakeFileSystem(),
+                Files = new InMemoryFileStore(),
+                Git = new NoGit(),
                 Snapshots = _snapshots,
                 Broadcaster = new CountingBroadcaster(),
                 SystemFallback = _ => null,

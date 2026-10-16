@@ -14,6 +14,8 @@ public static class EnvKitCli
         ProfileCommands.Create(services),
         VaultCommands.Create(services),
         RunCommand.Create(services),
+        DotEnvCommands.Create(services),
+        UserSecretsCommands.Create(services),
         SnapshotCommands.Create(services),
         ApplyPlanCommand.Create(services),
     };

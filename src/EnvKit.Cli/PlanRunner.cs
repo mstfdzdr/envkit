@@ -16,7 +16,8 @@ internal static class ExitCodes
 /// <summary>Preview, confirm, apply: the one path every writing command takes.</summary>
 internal sealed class PlanRunner(CliServices services)
 {
-    public int Run(ChangePlan plan, bool dryRun, bool yes)
+    /// <param name="beforeApply">Runs after confirmation, right before the plan is applied (e.g. a vault write the plan relies on).</param>
+    public int Run(ChangePlan plan, bool dryRun, bool yes, Action? beforeApply = null)
     {
         var output = services.Out;
         if (plan.IsEmpty)
@@ -47,6 +48,7 @@ internal sealed class PlanRunner(CliServices services)
             }
         }
 
+        beforeApply?.Invoke();
         try
         {
             // Machine-scope changes trigger a UAC prompt here when this terminal is not elevated.
